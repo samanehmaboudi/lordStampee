@@ -1,0 +1,75 @@
+/* ========== GRILLE DU CATALOGUE (toutes les cartes du site) ========== */
+.catalogue-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 50px 0;
+}
+
+.catalogue-container h2 {
+    text-align: left;
+    font-size: var(--taille-titre);
+    font-weight: bold;
+    color: var(--couleur-principale);
+    margin-bottom: var(--espace-grand);
+    text-transform: uppercase;
+}
+
+/* Grille du catalogue (beaucoup de cartes) */
+.catalogue-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Adaptatif */
+    gap: var(--espace-grand);
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* Responsive */
+@media screen and (max-width: 1024px) {
+    .catalogue-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 colonnes sur tablettes */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .catalogue-grid {
+        grid-template-columns: repeat(1, 1fr); /* 1 colonne sur mobiles */
+    }
+}
+
+/* ========== GRILLE DES PRODUITS LIÉS (Seulement 4 cartes) ========== */
+.produits-relies-container {
+    max-width: 900px;
+    margin: auto;
+    padding: 30px 0;
+}
+
+.produits-relies-container h2 {
+    text-align: left;
+    font-size: var(--taille-titre);
+    font-weight: bold;
+    color: var(--couleur-principale);
+    margin-bottom: var(--espace-grand);
+    text-transform: uppercase;
+}
+
+/* Grille des produits liés (4 cartes max) */
+.produits-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Toujours 4 colonnes */
+    gap: var(--espace-grand);
+    max-width: 900px;
+    margin: auto;
+}
+
+/* Responsive */
+@media screen and (max-width: 1024px) {
+    .produits-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 colonnes sur tablettes */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .produits-grid {
+        grid-template-columns: repeat(1, 1fr); /* 1 colonne sur mobiles */
+    }
+}

@@ -1,0 +1,33 @@
+{# views/users/create.twig #}
+{{ include('layouts/header.twig', { title: 'Créer un utilisateur' }) }}
+
+<h2>Créer un utilisateur</h2>
+
+{% if exists_err %}
+  <div class="error">{{ exists_err }}</div>
+{% endif %}
+
+<form action="{{ base }}/user/create" method="post">
+
+  <div>
+    <label for="name">Nom</label>
+    <input id="name" type="text" name="name" value="{{ name|e }}" required autofocus>
+    {% if name_err %}<div class="error">{{ name_err }}</div>{% endif %}
+  </div>
+
+  <div>
+    <label for="email">Email</label>
+    <input id="email" type="email" name="email" value="{{ email|e }}" required>
+    {% if email_err %}<div class="error">{{ email_err }}</div>{% endif %}
+  </div>
+
+  <div>
+    <label for="password">Mot de passe</label>
+    <input id="password" type="password" name="password" required>
+    {% if password_err %}<div class="error">{{ password_err }}</div>{% endif %}
+  </div>
+
+  <button type="submit">Créer</button>
+</form>
+
+{{ include('layouts/footer.twig') }}

@@ -1,0 +1,61 @@
+
+/* ========== DÉTAILS DU PRODUIT ========== */
+.details-produit {
+    width: 50%;
+
+}
+
+
+
+.informations {
+    padding: var(--espace-grand);
+    border-left: 2px solid var(--couleur-bordure);
+}
+
+.informations h2 {
+    font-size: var(--taille-titre);
+    color: var(--couleur-principale);
+    margin-bottom: var(--espace-moyen);
+
+}
+
+.informations p {
+    font-size: var(--taille-texte);
+    margin-bottom: var(--espace-moyen);
+
+}
+
+.badge-miser {
+    display: inline-block;
+    padding: 5px 10px;
+    background: var(--couleur-or);
+    color: white;
+    border-radius: 5px;
+    font-size: var(--taille-texte);
+    font-weight: bold;
+    margin-right: 5px;
+
+
+
+}
+
+.badge-miser:hover {
+    background-color: rgb(69, 117, 228);
+    /* color: black; */
+}
+
+
+
+.prix {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--couleur-or);
+    margin-top: var(--espace-moyen);
+
+    
+}
+
+.prix strong {
+    color: brown;
+    font-size: var(--taille-titre);
+}

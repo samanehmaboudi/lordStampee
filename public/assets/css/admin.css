@@ -1,0 +1,80 @@
+
+/* ===== Tableau de bord admin ===== */
+.container-dashboard {
+    max-width: 900px;
+    margin: 40px auto;
+    background-color: rgb(69, 117, 228);
+    color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.container-dashboard h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 26px;
+    color: #fff;
+}
+
+.container-dashboard p {
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+.container-dashboard ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+}
+
+.container-dashboard ul li {
+    margin: 10px 0;
+}
+
+.container-dashboard ul li a {
+    display: inline-block;
+    background-color: #b0975c;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.container-dashboard ul li a:hover {
+    background-color: #927c48;
+}
+
+
+
+
+
+
+
+.admin-header, .admin-footer {
+    background-color: #4a3f2d;
+    color: #fff;
+    padding: 15px;
+    text-align: center;
+}
+
+.admin-header nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.admin-header nav ul li a {
+    color: #b0975c;
+    font-weight: bold;
+    text-decoration: none;
+}
+.admin-header nav ul li a:hover {
+    text-decoration: underline;
+}

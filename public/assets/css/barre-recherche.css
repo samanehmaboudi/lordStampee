@@ -1,0 +1,141 @@
+/* Barre de recherche spécifique */
+.barre-recherche {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--espace-moyen) var(--espace-xl);
+    background-color: var(--couleur-texte);
+    border: 2px solid var(--couleur-or);
+    border-radius: var(--espace-petit);
+    width: 40%;
+    margin: auto;
+    margin-bottom: var(--espace-grand);
+}
+  
+.recherche-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border-radius: var(--espace-petit);
+    overflow: hidden;
+    gap: 15px;
+}
+
+/* Style du sélecteur de catégories */
+.input-select {
+    border: none;
+    font-size: 14px;
+    background: var(--couleur-texte);
+    padding: var(--espace-petit);
+    padding-left: 0;
+    border-right: 2px solid var(--couleur-or);
+    cursor: pointer;
+    text-align: center;
+}
+
+/* Champ de recherche */
+.champ-recherche-container {
+    display: flex;
+    align-items: center;
+    width: 80%;
+    position: relative;
+    background: var(--couleur-texte);
+}
+
+/* Input du champ de recherche */
+.input-text {
+    border: none;
+    font-size: var(--taille-texte);
+    outline: none;
+    width: 100%;
+    padding: var(--espace-moyen);
+}
+
+/* Placeholder du champ de recherche */
+.input-text::placeholder {
+    font-size: var(--taille-texte);
+    color: var(--couleur-gris);
+    
+}
+
+/* Bouton de recherche */
+.bouton-recherche {
+    position: absolute;
+    right: 0; 
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--couleur-or);
+    border: none;
+    cursor: pointer;
+    padding: 20px;
+    font-size: var(--taille-titre);
+    color: white;
+    border-radius: 5px;
+}
+
+/* Icône de recherche */
+.bouton-recherche i {
+    font-size: 18px;
+    color: white;
+}
+
+/* Effet hover du bouton */
+.bouton-recherche:hover {
+    background-color: var(--couleur-bleu);
+}
+
+/* Classe pour cacher les labels visuellement mais accessibles aux lecteurs d'écran */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+
+/* =================== RESPONSIVE =================== */
+@media (max-width: 1024px) {
+  .barre-recherche {
+      width: 70%;
+      margin-bottom: 15px;
+  }
+
+  .recherche-container {
+      flex-direction: column;
+      gap: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .barre-recherche {
+      width: 90%;
+  }
+
+  .input-select, 
+  .champ-recherche-container .input-text {
+      font-size: 14px;
+      padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .barre-recherche {
+      width: 100%;
+      padding: 8px;
+  }
+
+  .input-text {
+      font-size: 12px;
+      padding: 8px;
+  }
+
+  .bouton-recherche {
+      padding: 8px;
+  }
+}
+

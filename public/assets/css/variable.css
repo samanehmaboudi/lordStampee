@@ -1,0 +1,21 @@
+/* ========== VARIABLES GLOBALES ========== */
+:root {
+    --couleur-principale: #1d2540;
+    --couleur-secondaire: #4a3f2d;
+    --couleur-texte: #fff;
+    --couleur-accent: #a88d5e;
+    --couleur-gris: #666;
+    --couleur-bordure: #ddd;
+    --couleur-or: #b0975c;
+    --couleur-bleu: rgb(69, 117, 228);
+
+    --font-principale: Arial, sans-serif;
+    --taille-texte: 16px;
+    --taille-paragraphe: 20px;
+    --taille-titre: 24px;
+
+    --espace-petit: 5px;
+    --espace-moyen: 10px;
+    --espace-grand: 20px;
+    --espace-xl: 30px;
+}

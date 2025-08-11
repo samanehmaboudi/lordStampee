@@ -1,0 +1,29 @@
+{{ include('layouts/header.twig', { title: 'Mon profil' }) }}
+
+<h2>Mon profil</h2>
+
+{% if success %}
+  <div class="success">{{ success }}</div>
+{% endif %}
+{% if err %}
+  <div class="error">{{ err }}</div>
+{% endif %}
+
+<form action="{{ base }}/update-user" method="post" novalidate>
+  <div>
+    <label for="name">Nom</label>
+    <input id="name" type="text" name="name" value="{{ user.name|e }}" required autofocus autocomplete="name">
+  </div>
+
+  <div>
+    <label for="email">Email</label>
+    <input id="email" type="email" name="email" value="{{ user.email|e }}" required autocomplete="email">
+  </div>
+
+  <button type="submit">Mettre à jour</button>
+</form>
+
+{# Affiche ce lien seulement si la route /update-password existe #}
+<p><a href="{{ base }}/update-password">Changer mon mot de passe</a></p>
+
+{{ include('layouts/footer.twig') }}

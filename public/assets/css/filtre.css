@@ -1,0 +1,133 @@
+
+.filtre-container {
+    width: 280px;
+    background: #F9F8F6;
+    padding: 20px;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+    border: 1px solid #D1D1D1;
+}
+
+
+.filtre-container h3 {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    
+}
+
+
+.filtre-container h3::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: #000;
+    margin-top: 5px;
+}
+
+
+.filtre-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    
+}
+
+
+.filtre-container label {
+    font-weight:400;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #0f0e0e;
+    text-align: left;
+}
+
+
+.filtre-range {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+
+    color: #333;
+    gap: 10px;
+}
+
+
+.filtre-range input[type="range"] {
+    width: 100%;
+    background: #D1E1FA;
+    height: 5px;
+    border-radius: 5px;
+    outline: none;
+}
+
+
+.filtre-range input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: black;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+
+.filtre-container select {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #555;
+
+    border-radius: 5px;
+    font-size: 14px;
+    background: #D1E1FA;
+}
+
+
+
+.filtre-section legend {
+    font-size: 14px;
+    font-weight: bold;
+    color: #222;
+    margin-bottom: 8px;
+    position: relative;
+    padding-left: 20px;
+}
+
+
+
+/* Espacement entre les sections */
+.filtre-section {
+    border: none;
+    margin-bottom: 15px;
+}
+
+
+.checkbox-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+
+
+.filtre-container input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+
+}
+
+
+.filtre-section:not(:last-child) {
+    border-bottom: 1px solid #D1D1D1;
+    padding-bottom: 10px;
+}

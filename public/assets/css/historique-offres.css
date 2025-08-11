@@ -1,0 +1,30 @@
+
+/* ========== HISTORIQUE DES OFFRES ========== */
+.historique-offres {
+    margin-top: var(--espace-grand);
+    padding: var(--espace-moyen);
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 5px;
+    background: #f9f9f9;
+    max-width: 400px;
+    align-self: end;
+    margin-bottom: auto;
+}
+
+.historique-offres summary {
+    font-weight: bold;
+    cursor: pointer;
+
+}
+
+.historique-offres ul {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--espace-moyen);
+}
+
+.historique-offres li {
+    padding: var(--espace-moyen);
+    border-bottom: 1px solid var(--couleur-bordure);
+    font-size: var(--taille-texte);
+}

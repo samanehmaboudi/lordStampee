@@ -1,0 +1,42 @@
+.timbres-search-bar {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin-bottom: 20px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--couleur-or);
+    border-radius: 1px;
+    background: white;
+ 
+
+    overflow: hidden;
+    padding: 5px;
+    width: 300px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-box input {
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+
+    width: 85%;
+    outline: none;
+    background: none;
+}
+
+.search-btn {
+    background: none;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.search-btn i {
+    font-size: 18px;
+    color: var(--couleur-or);
+}

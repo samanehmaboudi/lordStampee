@@ -1,0 +1,19 @@
+{{ include('layouts/header.twig', { title: 'Utilisateurs' }) }}
+<h2>Utilisateurs</h2>
+<table>
+  <thead><tr><th>ID</th><th>Nom</th><th>Email</th><th>Créé</th></tr></thead>
+  <tbody>
+    {% for u in users %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.name|e }}</td>
+        <td>{{ u.email|e }}</td>
+        <td>{{ u.creationDate }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<p><a href="{{ base }}/user/create">Créer un utilisateur</a></p>
+
+{{ include('layouts/footer.twig') }}

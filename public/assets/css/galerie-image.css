@@ -1,0 +1,58 @@
+/* ========== GALERIE D'IMAGES ========== */
+.image-container {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    position: relative;
+
+}
+
+.galerie-images {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid var(--couleur-bordure);
+    padding: var(--espace-grand);
+    background: #f8f8f8;
+}
+
+.miniatures {
+    display: flex;
+    
+    gap: var(--espace-moyen);
+    margin-bottom: var(--espace-grand);
+}
+
+
+
+.miniatures img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border: 2px solid var(--couleur-bordure);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+
+
+}
+
+.miniatures img:hover {
+    border-color: var(--couleur-or);
+}
+
+.image-principale img {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 5px;
+    border: 3px solid var(--couleur-bordure);
+
+}
+
+.image-principale figcaption {
+    text-align: center;
+    font-size: var(--taille-texte);
+    color: var(--couleur-gris);
+    margin-top: var(--espace-moyen);
+    
+}

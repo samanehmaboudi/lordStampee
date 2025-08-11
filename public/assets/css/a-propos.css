@@ -1,0 +1,119 @@
+/* ----------- Section "À propos" ----------- */
+.a-propos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+    padding: 80px 5%;
+    background: #f5f5f5;
+}
+
+/* Image à gauche */
+.a-propos-image {
+    flex: 1;
+}
+
+.a-propos-image img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Texte à droite */
+.a-propos-texte {
+    flex: 1;
+    padding: 20px;
+    background: #eaeff4;
+    border-radius: 8px;
+}
+
+.a-propos h2 {
+    font-size: 32px;
+    color: #2d3e50;
+    margin-bottom: 15px;
+}
+
+.a-propos p {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+/* Bouton */
+.a-propos .btn {
+    display: inline-block;
+    padding: 12px 20px;
+    background: gold;
+    color: black;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: 0.3s;
+    border: 2px solid transparent;
+}
+
+.a-propos .btn:hover {
+    background: #ffcc00;
+    border-color: black;
+}
+
+/* 🎯 Responsive - Tablettes et Mobiles */
+@media screen and (max-width: 1024px) {
+    .a-propos {
+        flex-direction: column; /* Passe en colonne */
+        text-align: center;
+        gap: 30px;
+    }
+
+    .a-propos-image, .a-propos-texte {
+        width: 100%;
+    }
+
+    .a-propos h2 {
+        font-size: 28px;
+    }
+
+    .a-propos p {
+        font-size: 16px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .a-propos {
+        padding: 50px 5%;
+    }
+
+    .a-propos h2 {
+        font-size: 24px;
+    }
+
+    .a-propos p {
+        font-size: 15px;
+    }
+
+    .a-propos .btn {
+        padding: 10px 18px;
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .a-propos {
+        padding: 40px 5%;
+    }
+
+    .a-propos h2 {
+        font-size: 22px;
+    }
+
+    .a-propos p {
+        font-size: 14px;
+    }
+
+    .a-propos .btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}

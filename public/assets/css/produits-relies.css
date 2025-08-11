@@ -1,0 +1,204 @@
+
+.produits-relies {
+    margin: auto;
+    padding: 50px 0;
+}
+
+/* TITRE DE LA SECTION */
+.produits-relies h2 {
+    text-align: left;
+    font-size: 26px;
+    font-weight: bold;
+    color: var(--couleur-principale);
+    margin-bottom: 40px;
+    text-transform: uppercase;
+}
+
+/* ========== LISTE DES PRODUITS EN GRID ========== */
+.liste-produits {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Ajustement automatique */
+    gap: 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* ========== CARTE PRODUIT ========== */
+.carte-produit {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    padding-bottom: 15px;
+    position: relative;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+}
+
+/* EFFET HOVER */
+.carte-produit:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* IMAGE DU PRODUIT */
+.image-produit {
+    position: relative;
+    padding: 10px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f8f8;
+}
+
+.image-produit img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-bottom: 3px solid #ddd;
+}
+
+/* ÉTIQUETTES */
+.etiquette {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: var(--couleur-or);
+    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.etiquette.promo {
+    background-color: red;
+}
+
+.etiquette.edition {
+    background-color: blue;
+}
+
+/* DETAILS DU PRODUIT */
+.details-produit {
+    padding: 12px;
+    text-align: left;
+    font-family: 'Georgia', serif;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* TITRE DU PRODUIT */
+.details-produit h3 {
+    font-size: 18px;
+    color: var(--couleur-principale);
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+/* DESCRIPTION DU PRODUIT */
+.description-produit {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+/* CODE STOCK */
+.code-stock {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 6px;
+}
+
+/* PRIX */
+.prix {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--couleur-or);
+    margin-bottom: 15px;
+}
+
+/* PRIX BARRÉ POUR PROMOTION */
+.prix s {
+    color: red;
+    font-size: 14px;
+    margin-right: 5px;
+}
+
+/* BOUTON "FAIRE UNE OFFRE" */
+.bouton-offre {
+    background-color: transparent;
+    color: var(--couleur-or);
+    border: 2px solid var(--couleur-or);
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 50%;
+    align-self: self-start;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.bouton-offre:hover {
+    background-color:rgb(69, 117, 228);
+    color: white;
+}
+
+/* ICONES ACTIONS */
+.actions-produit {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+    margin-top: auto;
+}
+
+/* Icônes */
+.actions-produit i {
+    font-size: 18px;
+    color: var(--couleur-principale);
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.actions-produit i:hover {
+    color: var(--couleur-or);
+}
+
+/* LIGNE DORÉE EN BAS DES CARTES */
+.carte-produit::after {
+    content: "";
+    display: block;
+    height: 4px;
+    background-color: transparent;
+    width: 90%;
+    margin: auto;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: background-color 0.3s ease-in-out;
+}
+
+.carte-produit:hover::after {
+    background-color: var(--couleur-or);
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media screen and (max-width: 1200px) {
+    .liste-produits {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .liste-produits {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}

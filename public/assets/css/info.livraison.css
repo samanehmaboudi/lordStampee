@@ -1,0 +1,40 @@
+/* ========== LIVRAISON ET PAIEMENT ========== */
+.info-livraison {
+    padding: var(--espace-grand);
+    background: #eef1f5;
+    border-radius: 5px;
+    margin-top: var(--espace-grand);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-livraison h2 {
+    font-size: var(--taille-titre);
+    margin-bottom: var(--espace-moyen);
+    color: var(--couleur-principale);
+}
+
+.icones-paiement {
+    display: flex;
+    gap: var(--espace-moyen);
+}
+
+.icones-paiement i {
+    font-size: 30px;
+
+}
+
+.icones-paiement .mastercard {
+    color: rgb(148, 42, 42);
+}
+
+
+.icones-paiement .visa {
+    color: rgb(38, 30, 83);
+}
+
+
+.icones-paiement .paypal {
+    color: rgb(74, 105, 151);
+}

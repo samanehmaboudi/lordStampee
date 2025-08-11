@@ -1,0 +1,75 @@
+{% include 'layouts/header.twig' %}
+
+
+<main>
+    {% if session.privilege == 'admin' %}
+        <div class="admin-message">
+            <h2>Bienvenue, Admin {{ session.username }} </h2>
+            <p>Accédez à l’espace de gestion :</p>
+            <a href="{{ base }}/dashboard" class="btn">Aller au tableau de bord</a>
+        </div>
+    {% else %}
+        <div class="user-message">
+ 
+
+        </div>
+    {% endif %}
+    
+     <!-- Bannière principale -->
+        <section class="banniere">
+            <div class="banniere-contenu">
+                <h1>Découvrez les timbres rares et historiques</h1>
+                <p>Rejoignez la plus grande communauté de collectionneurs et participez aux enchères exclusives.</p>
+                <a href="index.php?page=catalogue" class="btn btn-large">Voir le Catalogue</a>
+            </div>
+        </section>
+
+        <!-- Sections mises en avant -->
+        <section class="sections-mise-en-avant">
+            <div class="categorie">
+                <img src="{{ asset }}/assets/images/page-accueil/how_to_penny_black.png" alt="Timbres Grande-Bretagne">
+                <div class="overlay">
+                    <h2>Grande-Bretagne</h2>
+                    <a href="#">Explorer</a>
+                </div>
+            </div>
+            <div class="categorie">
+                <img src="/{{ asset }}/assets/images/page-accueil/SG_Stamps_high_res_05.png" alt="Timbres Commonwealth">
+                <div class="overlay">
+                    <h2>Commonwealth</h2>
+                    <a href="#">Explorer</a>
+                </div>
+            </div>
+            <div class="categorie">
+                <img src="{{ asset }}/assets/images/page-accueil/SG_South_Australia_stamp.png" alt="Accessoires et albums">
+                <div class="overlay">
+                    <h2>Accessoires</h2>
+                    <a href="#">Explorer</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- À propos de Lord Stampee -->
+        <section class="a-propos">
+            <div class="a-propos-image">
+                <img src="{{ asset }}/assets/images/page-accueil/100349548-wealthy-older-man-relaxing-with-cigar-gettyp.webp" alt="Histoire de Lord Stampee">
+            </div>
+            <div class="a-propos-texte">
+                <h2>Notre Histoire</h2>
+                <p>
+                    Lord Stampee est né d’une passion pour la philatélie et du désir de rassembler une communauté
+                    de collectionneurs à travers le monde. Depuis ses débuts, la plateforme est devenue une référence
+                    pour l’achat, la vente et l’échange de timbres rares.
+                </p>
+                <p>
+                    Avec une sélection minutieuse de timbres de collection et des enchères exclusives,
+                    Lord Stampee s’engage à offrir un service sécurisé et accessible à tous les amateurs
+                    et experts en philatélie.
+                </p>
+                <a href="#" class="btn">En savoir plus</a>
+            </div>
+        </section>
+
+</main>
+
+{% include 'layouts/footer.twig' %}

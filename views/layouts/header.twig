@@ -1,0 +1,150 @@
+<!DOCTYPE html> 
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title ?? 'Lord Stampee' }}</title>
+
+    <!-- Feuilles de styles -->
+    <link rel="stylesheet" href="{{ asset }}/assets/css/main.css">
+    <link rel="stylesheet" href="{{ asset }}/assets/css/admin.css">
+    <link rel="stylesheet" href="{{ asset }}/assets/css/banniere.css">
+    <link rel="stylesheet" href="{{ asset }}/assets/css/a-propos.css">
+    <link rel="stylesheet" href="{{ asset }}/assets/css/footer.css">
+   
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+
+<body>
+
+<header class="conteneur-en-tete ">
+    <div class="logo">
+        <img src="{{ asset }}/assets/images/logo.png" alt="Logo Lord Stampee">
+        <div class="texte-logo">
+            <span class="lord">LORD</span> <span class="stampee">STAMPEE</span>
+            <p class="slogan">Le royaume de la philatélie</p>
+        </div>
+    </div>
+
+    {% if session.loggedin %}
+        <div class="welcome-user">
+            Bonjour, {{ session.username }}{% if session.privilege == 'admin' %} (Admin){% endif %}
+        </div>
+    {% endif %}
+
+    <nav class="navigation-haut">
+        <ul>
+            <!-- <li><a href="#">Devenir Membre</a></li> -->
+            <li><a href="#">Blog</a></li>
+            {% if session.privilege == 'superadmin' %}
+            <li><a href="{{ base }}/superadmin-dashboard">SuperAdmin Panel</a></li>
+            {% endif %}
+
+
+            {% if session.loggedin %}
+                <li><a href="{{ base }}/logout" class="se-connecter">Déconnexion</a></li>
+            {% else %}
+                <li><a href="{{ base }}/login" class="se-connecter">Se Connecter</a></li>
+            {% endif %}
+            
+            <li class="changer-langue">
+                <img src="{{ asset }}/assets/images/canada-flag.png" alt="Drapeau Canada">
+                <label for="langue" class="visually-hidden">Sélectionner la langue :</label>
+                <select id="langue" class="input-select">
+                    <option>FR</option>
+                    <option>EN</option>
+                </select>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<!-- Barre de recherche -->
+<div class="barre-recherche">
+    <div class="recherche-container">
+        <div class="categorie-container">
+            <label for="selection-categorie" class="visually-hidden">Catégorie :</label>
+            <select id="selection-categorie" class="input-select">
+                <option selected>Toutes les Catégories</option>
+                <optgroup label="Filtrage">
+                    <option value="annee">Année d’émission</option>
+                    <option value="pays">Pays d’origine</option>
+                </optgroup>
+                <optgroup label="Timbres">
+                    <option value="historiques">Timbres Historiques</option>
+                    <option value="modernes">Timbres Modernes</option>
+                    <option value="commemoratifs">Timbres Commémoratifs</option>
+                    <option value="rares">Timbres rares / édition limitée</option>
+                </optgroup>
+                <optgroup label="Thèmes">
+                    <option value="animaux">Animaux et nature</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <div class="champ-recherche-container">
+            <label for="champ-recherche" class="visually-hidden">Rechercher :</label>
+            <input type="text" id="champ-recherche" class="input-text" placeholder="Tapez ici...">
+            <button class="bouton-recherche" aria-label="Lancer la recherche">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Menu principal -->
+<nav class="menu-principal">
+    <button class="hamburger" aria-label="Ouvrir le menu">
+        <span class="hamburger-icon"></span>
+        <span class="hamburger-icon"></span>
+        <span class="hamburger-icon"></span>
+    </button>
+    <ul class="menu-items">
+        <li class="menu-deroule">
+            <a class="declencheur-menu" href="#">Enchères</a>
+            <ul>
+                <li><a href="#">Enchères en cours</a></li>
+                <li><a href="#">Résultats passés</a></li>
+            </ul>
+        </li>
+        {% if session.loggedin %}
+        <li><a href="{{ base }}/home">Accueil</a></li>
+        {% endif %}
+
+
+        <li><a href="{{ base }}/catalogue">Catalogue</a></li>
+        <li><a href="#">À propos</a></li>
+        <li class="menu-deroule">
+            <a class="declencheur-menu" href="#">Collection et boutique</a>
+            <ul>
+                <li><a href="#">Timbres rares</a></li>
+                <li><a href="#">Nouveautés</a></li>
+            </ul>
+        </li>
+        <li class="menu-deroule">
+            <a class="declencheur-menu" href="#">Compte</a>
+            <ul>
+                {% if session.loggedin %}
+                    <li><a href="#">Profil</a></li>
+                    <li><a href="#">Mes enchères</a></li>
+                    <li><a href="#">Historique des transactions</a></li>
+                    <li><a href="#">Notifications</a></li>
+                    <li><a href="#">Paiement sécurisé</a></li>
+                    <li><a href="#">Favoris</a></li>
+                    <li><a href="{{ base }}/logout">Déconnexion</a></li>
+                {% else %}
+                    <li><a href="{{ base }}/login">Connexion</a></li>
+                    <li><a href="{{ base }}/register">Inscription</a></li>
+                {% endif %}
+            </ul>
+        </li>
+        <li class="menu-deroule">
+            <a class="declencheur-menu" href="#">Contact</a>
+            <ul>
+                <li><a href="#">Aide/FAQ</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>

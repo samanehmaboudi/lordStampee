@@ -1,0 +1,190 @@
+/* Labels pour les champs de formulaire */
+label {
+    font-size: var(--taille-texte);
+    color: var(--couleur-principale);
+    display: block;
+    margin-bottom: var(--espace-petit);
+}
+
+/* Champs de formulaire */
+input, select {
+    padding: var(--espace-petit);
+    border: 1px solid var(--couleur-bordure);
+    border-radius: var(--espace-petit);
+    width: 100%;
+    font-size: var(--taille-texte);
+}
+
+/* Conteneur de l'en-tête */
+.conteneur-en-tete {
+  padding: 20px 5%; /* Augmenter légèrement le padding */
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px; 
+  padding: var(--espace-grand) var(--espace-xl);
+  background-color: var(--couleur-texte);
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    height: 60px;
+    margin-right: var(--espace-moyen);
+}
+
+.texte-logo .lord {
+    font-size: var(--taille-titre);
+    font-weight: bold;
+    color: var(--couleur-secondaire);
+}
+
+.texte-logo .stampee {
+    font-size: var(--taille-titre);
+    font-weight: bold;
+    color: var(--couleur-principale);
+}
+
+.slogan {
+    font-size: var(--taille-texte);
+    color: var(--couleur-gris);
+}
+
+/* Navigation du haut */
+.navigation-haut ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 30px; 
+}
+
+.navigation-haut ul li {
+    margin: 0 var(--espace-moyen);
+}
+
+.navigation-haut ul li a {
+    text-decoration: none;
+    color: var(--couleur-principale);
+    font-size: var(--taille-texte);
+    padding: var(--espace-petit) var(--espace-grand);
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.navigation-haut ul li a:hover {
+    color: var(--couleur-accent);
+}
+
+/* Style du bouton Se Connecter */
+.navigation-haut ul li a.se-connecter {
+    border: 2px solid var(--couleur-or);
+    color: var(--couleur-or);
+    background-color: transparent;
+    padding: var(--espace-moyen) var(--espace-xl);
+    border-radius: var(--espace-petit);
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+
+
+}
+
+.navigation-haut ul li a.se-connecter:hover {
+    background-color: var(--couleur-or);
+    color: var(--couleur-texte);
+    border-color: var(--couleur-or);
+
+}
+
+/* Sélecteur de langue */
+.changer-langue {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.changer-langue img {
+    height: 20px;
+    margin-right: var(--espace-petit);
+
+
+}
+
+.changer-langue select {
+    border: none;
+    background: transparent;
+    font-size: var(--taille-texte);
+    cursor: pointer;
+}
+
+.changer-langue select::after {
+    content: " ▼";
+    color: var(--couleur-or);
+
+
+}
+
+/* =================== RESPONSIVE =================== */
+@media (max-width: 1024px) {
+  .conteneur-en-tete {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px; /* Ajoute plus d'espace entre les éléments */
+  }
+
+  .navigation-haut ul {
+      flex-direction: column;
+      gap: 10px;
+  }
+
+  .navigation-haut ul li {
+      width: 100%;
+      text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .conteneur-en-tete {
+      padding: 15px;
+  }
+
+  .logo img {
+      height: 50px;
+  }
+
+  .slogan {
+      font-size: 14px;
+  }
+
+  .navigation-haut ul {
+      width: 100%;
+      gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .conteneur-en-tete {
+      flex-direction: column;
+      padding: 10px;
+  }
+
+  .logo img {
+      height: 40px;
+  }
+
+  .navigation-haut ul {
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+  }
+
+  .navigation-haut ul li {
+      text-align: center;
+      width: 100%;
+  }
+}

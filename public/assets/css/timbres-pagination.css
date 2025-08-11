@@ -1,0 +1,44 @@
+.timbres-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 80px;
+
+}
+
+
+
+.page-number, .dots {
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+
+.page-number {
+    background: #fbfbfc;
+    color: #333;
+
+    border: 1px solid #ddd;
+}
+
+.page-number:hover {
+    background: var(--couleur-or);
+
+}
+
+.pagination-arrow {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 10px;
+    transition: color 0.3s;
+}
+
+.pagination-arrow:hover {
+    color: #007bff;
+}

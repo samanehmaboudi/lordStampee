@@ -1,0 +1,39 @@
+/* ========== SECTION MISE ========== */
+.section-mise {
+    display: flex;
+    gap: var(--espace-moyen);
+    margin-top: var(--espace-grand);
+}
+
+.section-mise input {
+    flex-grow: 1;
+    padding: var(--espace-moyen);
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 5px;
+    font-size: var(--taille-texte);
+}
+
+.section-mise button {
+    padding: var(--espace-moyen);
+    background-color: var(--couleur-principale);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.section-mise button:hover {
+    background-color: var(--couleur-or);
+    color: black;
+}
+
+.bouton-annuler {
+    background-color: #dc3545 !important;
+    color: var(--couleur-texte);
+}
+
+.bouton-annuler:hover {
+    background-color: #c82333 !important;
+    color: var(--couleur-principale);
+}

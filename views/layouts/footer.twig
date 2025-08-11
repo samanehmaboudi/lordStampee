@@ -1,0 +1,75 @@
+<!-- Pied de page -->
+<footer class="footer">
+    <div class="footer-header">
+        <div class="footer-logo">
+            <img src="{{ asset }}/assets/images/logo.png" alt="Lord Stampee - Logo">
+        </div>
+        <nav class="footer-nav">
+            <ul>
+                <li><a href="#">Enchères</a></li>
+                <li><a href="#">Collection et boutique</a></li>
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Compte</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="conteneur">
+        <!-- Catégories populaires -->
+        <section class="footer-categories">
+            <h3>Catégories populaires</h3>
+            <ul>
+                <li><a href="#">Timbres rares</a></li>
+                <li><a href="#">Timbres anciens</a></li>
+                <li><a href="#">Éditions limitées</a></li>
+                <li><a href="#">Timbres thématiques</a></li>
+                <li><a href="#">Nouveaux arrivages</a></li>
+            </ul>
+        </section>
+
+        <!-- À propos -->
+        <section class="footer-a-propos">
+            <h3>À propos de Lord Stampee</h3>
+            <ul>
+                <li><a href="#">Notre histoire</a></li>
+                <li><a href="#">Nos engagements</a></li>
+                <li><a href="#">Comment ça fonctionne</a></li>
+                <li><a href="#">Témoignages</a></li>
+                <li><a href="#">Partenariats</a></li>
+            </ul>
+        </section>
+
+        <!-- Contact -->
+        <section class="footer-contact">
+            <h3>Contactez-nous</h3>
+            <p><i class="fa-solid fa-envelope"></i> 
+                <a href="mailto:contact@lordstampee.com">contact@lordstampee.com</a></p>
+            <p><i class="fa-solid fa-phone"></i> 
+                <a href="tel:+15141234567">+1 (514) 123-4567</a></p>
+            <div class="icones-sociaux">
+                <a href="https://www.facebook.com/votrepage" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="https://twitter.com/votreprofil" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                <a href="https://www.instagram.com/votreprofil" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://www.linkedin.com/in/votreprofil" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+        </section>
+
+        <!-- Connexion / Déconnexion -->
+        <div class="footer-connexion">
+            {% if session.loggedin %}
+                <a href="{{ asset }}/logout" class="btn-connexion">Déconnexion</a>
+            {% else %}
+                <a href="{{ asset }}/login" class="btn-connexion">Se Connecter</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="footer-bas">
+    <p>Copyright © {{ "now"|date("Y") }} Lord Stampee. Tous droits réservés.</p>
+
+    </div>
+</footer>
+
+</body>
+</html>

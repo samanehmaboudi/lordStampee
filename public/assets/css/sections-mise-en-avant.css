@@ -1,0 +1,120 @@
+/* ----------- Sections Mises en Avant ----------- */
+.sections-mise-en-avant {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 50px 5%;
+    flex-wrap: wrap;
+}
+
+/* Style des catégories */
+.categorie {
+    position: relative;
+    width: calc(33.33% - 20px); 
+    max-width: 350px; 
+    overflow: hidden;
+    border-radius: 10px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.categorie img {
+    width: 100%;
+    height: auto;
+    transition: transform 0.3s ease-in-out;
+}
+
+.categorie:hover img {
+    transform: scale(1.1);
+}
+
+/* Overlay texte */
+.overlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    text-align: center;
+    padding: 20px;
+    color: white;
+    transition: 0.3s;
+}
+
+.overlay h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.overlay a {
+    color: var(--couleur-or);
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.overlay a:hover {
+    color: #ffcc00;
+}
+
+/* 🎯 Responsive - Tablettes (1024px et moins) */
+@media screen and (max-width: 1024px) {
+    .sections-mise-en-avant {
+        gap: 15px;
+    }
+
+    .categorie {
+        width: calc(50% - 20px); 
+    }
+
+    .overlay h2 {
+        font-size: 20px;
+    }
+}
+
+
+@media screen and (max-width: 768px) {
+    .sections-mise-en-avant {
+        flex-direction: column; 
+        align-items: center;
+        gap: 20px;
+    }
+
+    .categorie {
+        width: 80%; 
+        max-width: 300px;
+    }
+
+    .overlay {
+        padding: 15px;
+    }
+
+    .overlay h2 {
+        font-size: 18px;
+    }
+
+    .overlay a {
+        font-size: 14px;
+    }
+}
+
+/* 🎯 Responsive - Petits mobiles (480px et moins) */
+@media screen and (max-width: 480px) {
+    .categorie {
+        width: 90%; /* Cartes plus larges sur petits écrans */
+        max-width: 280px;
+    }
+
+    .overlay {
+        padding: 10px;
+    }
+
+    .overlay h2 {
+        font-size: 16px;
+    }
+
+    .overlay a {
+        font-size: 13px;
+    }
+}
