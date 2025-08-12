@@ -1,29 +1,39 @@
 {{ include('layouts/header-auth.twig', { title: 'Connexion' }) }}
 
-<div class="container">
-  <h2>Connexion</h2>
-  {% if flash %}<div class="alert alert-success">{{ flash }}</div>{% endif %}
-  {% if logout_success %}<div class="success-message">{{ logout_success }}</div>{% endif %}
-  {% if login_err %}<div class="error-message">{{ login_err }}</div>{% endif %}
+<div class="auth-wrap">
+  <main class="auth-card" role="main">
+    <h1 class="auth-title">Connexion</h1>
+    <p class="auth-desc">Accédez à votre compte Lord Stampee.</p>
 
-  <form action="{{ base }}/login" method="post" novalidate>
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" value="{{ email|e }}" required autofocus autocomplete="email"
-             class="{{ email_err ? 'input-error' : '' }}">
-      {% if email_err %}<div class="error-message">{{ email_err }}</div>{% endif %}
-    </div>
+    {% if flash %}<div class="alert alert-success">{{ flash }}</div>{% endif %}
+    {% if logout_success %}<div class="alert alert-success">{{ logout_success }}</div>{% endif %}
+    {% if login_err %}<div class="alert alert-error">{{ login_err }}</div>{% endif %}
 
-    <div class="form-group">
-      <label for="password">Mot de passe</label>
-      <input type="password" id="password" name="password" required autocomplete="current-password"
-             class="{{ password_err ? 'input-error' : '' }}">
-      {% if password_err %}<div class="error-message">{{ password_err }}</div>{% endif %}
-    </div>
+    <form method="post" action="{{ base }}/login" novalidate>
+      <div class="form-field">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-input {{ email_err ? 'is-error' : '' }}"
+               type="email" id="email" name="email" value="{{ email|e }}"
+               required autofocus autocomplete="email">
+        {% if email_err %}<div class="form-error">{{ email_err }}</div>{% endif %}
+      </div>
 
-    <button type="submit" class="btn">Connexion</button>
-    <p>Pas encore de compte ? <a href="{{ base }}/register">Inscrivez-vous</a>.</p>
-  </form>
+      <div class="form-field">
+        <label class="form-label" for="password">Mot de passe</label>
+        <input class="form-input {{ password_err ? 'is-error' : '' }}"
+               type="password" id="password" name="password"
+               required autocomplete="current-password">
+        {% if password_err %}<div class="form-error">{{ password_err }}</div>{% endif %}
+      </div>
+
+      <div class="form-actions">
+        <button class="button" type="submit">Se connecter</button>
+        <div class="small-text">Pas encore de compte ?
+          <a href="{{ base }}/register">Inscrivez-vous</a>.
+        </div>
+      </div>
+    </form>
+  </main>
 </div>
 
 {{ include('layouts/footer-auth.twig') }}

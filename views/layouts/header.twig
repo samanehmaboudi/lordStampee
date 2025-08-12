@@ -7,6 +7,8 @@
 
     <!-- Feuilles de styles -->
     <link rel="stylesheet" href="{{ asset }}/assets/css/main.css">
+    <link rel="stylesheet" href="{{ base }}/assets/css/variables.css">
+    <link rel="stylesheet" href="{{ base }}/assets/css/auth.css">
     <link rel="stylesheet" href="{{ asset }}/assets/css/admin.css">
     <link rel="stylesheet" href="{{ asset }}/assets/css/banniere.css">
     <link rel="stylesheet" href="{{ asset }}/assets/css/a-propos.css">
@@ -127,7 +129,8 @@
             <a class="declencheur-menu" href="#">Compte</a>
             <ul>
                 {% if session.loggedin %}
-                    <li><a href="#">Profil</a></li>
+                    <li><a href="{{ base }}/profil">Profil</a></li>
+                     <li><a href="{{ base }}/users">Utilisateurs</a></li>
                     <li><a href="#">Mes enchères</a></li>
                     <li><a href="#">Historique des transactions</a></li>
                     <li><a href="#">Notifications</a></li>

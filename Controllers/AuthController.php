@@ -44,8 +44,25 @@ class AuthController
 
                 // Vérifie et crée la session si OK
                 if ($userModel->checkUser($data['email'], $data['password'])) {
-                    return View::redirect('users'); // après connexion
+                    if (session_status() === PHP_SESSION_NONE) session_start();
+                    session_regenerate_id(true);
+
+                    // Récupère l’utilisateur pour connaître son id/nom/rôle
+                    $user = $userModel->findByEmail($data['email']); // <-- voir étape 2
+
+                    // Pose la session (clé standard)
+                    $_SESSION['loggedin'] = true;
+                    $_SESSION['user_id']  = (int)$user['id'];
+                    $_SESSION['username'] = $user['name'] ?? '';
+                    $_SESSION['privilege'] = $user['role'] ?? 'user';
+
+                    // Compat si ailleurs tu utilises encore id_user
+                    $_SESSION['id_user'] = $_SESSION['user_id'];
+
+                    // Redirige direct vers le profil
+                    return View::redirect('profil');
                 }
+
 
                 $data['login_err'] = "Email ou mot de passe incorrect.";
             }

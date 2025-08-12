@@ -1,22 +1,27 @@
 <?php
 
 use App\Routes\Route;
+
 // Auth
-Route::get('login',  'AuthController@login');
-Route::post('login', 'AuthController@login');
-Route::get('register','AuthController@register');
+Route::get('login',    'AuthController@login');
+Route::post('login',   'AuthController@login');
+Route::get('register', 'AuthController@register');
 Route::post('register','AuthController@register');
-Route::get('logout', 'AuthController@logout');
+Route::get('logout',   'AuthController@logout');
+
+// Users (liste + création)
+// Users
+Route::get('users/create',  'UserController@create');
+Route::post('users/create', 'UserController@store');
+Route::get('users',         'UserController@index');
 
 
-// Users (liste + création + profil)
-Route::get('users',        'UserController@index');
-Route::get('user/create',  'UserController@create');
-Route::post('user/create', 'UserController@store');
-Route::get('profil',       'UserController@profil');
-Route::post('update-user', 'UserController@update');
+
+// Profil (mon compte via la session)
+Route::get('profil',                 'ProfileController@show');            // afficher le profil
+Route::post('profil',                'ProfileController@update');          // maj nom/email
+Route::post('profil/mot-de-passe',   'ProfileController@updatePassword');  // maj mot de passe
 
 // Accueil
-Route::get('/', 'HomeController@index');
-Route::get('home', 'HomeController@index');
-
+Route::get('/',   'HomeController@index');
+Route::get('home','HomeController@index');

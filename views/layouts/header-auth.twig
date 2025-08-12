@@ -1,19 +1,23 @@
-<!DOCTYPE html> 
+<!doctype html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>{{ title|default('Authentification') }}</title>
-    <link rel="stylesheet" href="{{ asset }}/assets/css/auth.css">
+  <meta charset="utf-8">
+  <title>{{ title|default('Authentification') }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {# assets_base = /Stampee-new/Projet-web1-sprint1/public #}
+  {% set assets_base = (asset is defined and asset) ? asset : (base ~ '/public') %}
+
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/variables.css?v=2">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/auth.css?v=4">
 </head>
-<body>
+<body class="page-auth">
 
-<nav>
-    <ul class="nav-auth">
-       <li><a href="{{ base }}/home">Accueil</a></li>
-        <li><a href="{{ base }}/catalogue">Catalogue</a></li>
-        <li><a href="{{ base }}/login">Connexion</a></li>
-        <li><a href="{{ base }}/register">Inscription</a></li>
-    </ul>
+<nav class="nav-auth">
+  <ul>
+    <li><a href="{{ base }}/home">Accueil</a></li>
+    <li><a href="{{ base }}/catalogue">Catalogue</a></li>
+    <li><a href="{{ base }}/login">Connexion</a></li>
+    <li><a href="{{ base }}/register">Inscription</a></li>
+  </ul>
 </nav>
-
-<main>

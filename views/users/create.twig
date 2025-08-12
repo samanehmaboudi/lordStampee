@@ -1,33 +1,42 @@
-{# views/users/create.twig #}
 {{ include('layouts/header.twig', { title: 'Créer un utilisateur' }) }}
 
-<h2>Créer un utilisateur</h2>
+{% set assets_base = (asset is defined and asset) ? asset : (base ~ '/public') %}
+<link rel="stylesheet" href="{{ assets_base }}/assets/css/variables.css?v=2">
+<link rel="stylesheet" href="{{ assets_base }}/assets/css/auth.css?v=4">
 
-{% if exists_err %}
-  <div class="error">{{ exists_err }}</div>
-{% endif %}
+<section class="center-page">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <h1 class="auth-title">Créer un utilisateur</h1>
 
-<form action="{{ base }}/user/create" method="post">
+      <form action="{{ base }}/users/create" method="post">
+        <div class="form-field">
+          <label class="form-label" for="name">Nom</label>
+          <input class="form-input {{ name_err ? 'is-error' : '' }}" id="name" name="name" value="{{ name|e }}" required>
+          {% if name_err %}<div class="form-error">{{ name_err }}</div>{% endif %}
+        </div>
 
-  <div>
-    <label for="name">Nom</label>
-    <input id="name" type="text" name="name" value="{{ name|e }}" required autofocus>
-    {% if name_err %}<div class="error">{{ name_err }}</div>{% endif %}
+        <div class="form-field">
+          <label class="form-label" for="email">Email</label>
+          <input class="form-input {{ email_err ? 'is-error' : '' }}" id="email" name="email" type="email" value="{{ email|e }}" required>
+          {% if email_err %}<div class="form-error">{{ email_err }}</div>{% endif %}
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="password">Mot de passe</label>
+          <input class="form-input {{ password_err ? 'is-error' : '' }}" id="password" name="password" type="password" required>
+          {% if password_err %}<div class="form-error">{{ password_err }}</div>{% endif %}
+        </div>
+
+        {% if exists_err %}<div class="alert alert-error">{{ exists_err }}</div>{% endif %}
+
+        <div class="form-actions">
+          <button class="button" type="submit">Créer</button>
+          <a class="button button-ghost" href="{{ base }}/users">Retour à la liste</a>
+        </div>
+      </form>
+    </div>
   </div>
-
-  <div>
-    <label for="email">Email</label>
-    <input id="email" type="email" name="email" value="{{ email|e }}" required>
-    {% if email_err %}<div class="error">{{ email_err }}</div>{% endif %}
-  </div>
-
-  <div>
-    <label for="password">Mot de passe</label>
-    <input id="password" type="password" name="password" required>
-    {% if password_err %}<div class="error">{{ password_err }}</div>{% endif %}
-  </div>
-
-  <button type="submit">Créer</button>
-</form>
+</section>
 
 {{ include('layouts/footer.twig') }}
