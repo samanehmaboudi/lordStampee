@@ -12,7 +12,7 @@ class AuthController
     {
         if (session_status() === PHP_SESSION_NONE) session_start();
 
-        // Déjà connecté → liste des utilisateurs (ou 'home' si tu préfères)
+       
         if (!empty($_SESSION['loggedin'])) {
             return View::redirect('users');
         }
@@ -48,13 +48,12 @@ class AuthController
                     session_regenerate_id(true);
 
                     // Récupère l’utilisateur pour connaître son id/nom/rôle
-                    $user = $userModel->findByEmail($data['email']); // <-- voir étape 2
+                    $user = $userModel->findByEmail($data['email']); 
 
                     // Pose la session (clé standard)
                     $_SESSION['loggedin'] = true;
                     $_SESSION['user_id']  = (int)$user['id'];
                     $_SESSION['username'] = $user['name'] ?? '';
-                    $_SESSION['privilege'] = $user['role'] ?? 'user';
 
                     // Compat si ailleurs tu utilises encore id_user
                     $_SESSION['id_user'] = $_SESSION['user_id'];

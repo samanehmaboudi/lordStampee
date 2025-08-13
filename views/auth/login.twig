@@ -9,7 +9,7 @@
     {% if logout_success %}<div class="alert alert-success">{{ logout_success }}</div>{% endif %}
     {% if login_err %}<div class="alert alert-error">{{ login_err }}</div>{% endif %}
 
-    <form method="post" action="{{ base }}/login" novalidate>
+    <form method="post" action="{{ base }}/login">
       <div class="form-field">
         <label class="form-label" for="email">Email</label>
         <input class="form-input {{ email_err ? 'is-error' : '' }}"

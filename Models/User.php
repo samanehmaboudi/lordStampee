@@ -8,54 +8,45 @@ use PDO;
 
 class User extends CRUD
 {
-    protected string $table = 'user'; 
+    protected string $table = 'user';
     protected string $primaryKey = 'id';
-    protected array $fillable = ['name', 'email', 'password'];
+    protected array $fillable = ['name', 'email', 'password_hash'];
 
     public function __construct()
     {
         parent::__construct(Database::getConnection(), $this->table);
     }
 
-    public function hashPassword(string $password): string
+    private function hashPassword(string $password): string
     {
         return password_hash($password, PASSWORD_DEFAULT);
     }
 
-    // Connexion simple : vérifie et remplit la session
+    /** Vérifie identifiants (email + mot de passe) */
     public function checkUser(string $email, string $password): bool
     {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-
         $user = $this->findByEmail($email);
+        if (!$user) return false;
 
-        if ($user && password_verify($password, $user['password'])) {
-            session_regenerate_id(true);
-            $_SESSION['loggedin'] = true;
-            $_SESSION['id']       = $user['id'];
-            $_SESSION['username'] = $user['name'];
-            $_SESSION['fingerPrint'] = md5(($_SERVER['HTTP_USER_AGENT'] ?? '').($_SERVER['REMOTE_ADDR'] ?? ''));
-            return true;
-        }
-
-        return false;
+        return password_verify($password, $user['password_hash']);
     }
 
+    /** Récupère un utilisateur par email */
     public function findByEmail(string $email): ?array
     {
-        $sql = "SELECT u.id, u.name, u.email, u.password
+        $sql = "SELECT u.id, u.name, u.email, u.role, u.password_hash
                 FROM `user` u
                 WHERE u.email = :email
                 LIMIT 1";
         $stmt = Database::getConnection()->prepare($sql);
-        $stmt->execute([':email' => $email]);
+        $stmt->execute([':email' => strtolower(trim($email))]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
     }
 
     public function findById(int $id): ?array
     {
-        $sql = "SELECT u.id, u.name, u.email, u.password, u.creationDate
+        $sql = "SELECT u.id, u.name, u.email, u.role, u.password_hash, u.creationDate
                 FROM `user` u
                 WHERE u.id = :id
                 LIMIT 1";
@@ -69,7 +60,7 @@ class User extends CRUD
     {
         $sql = "SELECT 1 FROM `user` WHERE email = :email LIMIT 1";
         $stmt = Database::getConnection()->prepare($sql);
-        $stmt->execute([':email' => $email]);
+        $stmt->execute([':email' => strtolower(trim($email))]);
         return (bool)$stmt->fetchColumn();
     }
 
@@ -82,11 +73,23 @@ class User extends CRUD
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /** Création : stocke le hash dans password_hash */
     public function create(array $data): bool
     {
-        // parent::create() utilise $fillable => name, email, password
-        $data['password'] = $this->hashPassword($data['password']);
-        return parent::create($data);
+        $name  = trim($data['name'] ?? '');
+        $email = strtolower(trim($data['email'] ?? ''));
+        $pass  = (string)($data['password'] ?? '');
+
+        if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || $pass === '') {
+            return false;
+        }
+
+        // parent::create() utilise $fillable -> name, email, password_hash
+        return parent::create([
+            'name'          => $name,
+            'email'         => $email,
+            'password_hash' => $this->hashPassword($pass),
+        ]);
     }
 
     public function updateNameEmail(int $id, string $name, string $email): bool
@@ -96,9 +99,10 @@ class User extends CRUD
         return $stmt->execute([':n' => $name, ':e' => $email, ':id' => $id]);
     }
 
+    /** Mise à jour du mot de passe (hashé) */
     public function updatePassword(int $id, string $newPassword): bool
     {
-        $sql = "UPDATE `user` SET password = :p WHERE id = :id";
+        $sql = "UPDATE `user` SET password_hash = :p WHERE id = :id";
         $stmt = Database::getConnection()->prepare($sql);
         return $stmt->execute([
             ':p'  => $this->hashPassword($newPassword),

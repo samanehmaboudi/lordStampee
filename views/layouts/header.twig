@@ -1,66 +1,67 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title ?? 'Lord Stampee' }}</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title|default('Lord Stampee') }}</title>
 
-    <!-- Feuilles de styles -->
-    <link rel="stylesheet" href="{{ asset }}/assets/css/main.css">
-    <link rel="stylesheet" href="{{ base }}/assets/css/variables.css">
-    <link rel="stylesheet" href="{{ base }}/assets/css/auth.css">
-    <link rel="stylesheet" href="{{ asset }}/assets/css/admin.css">
-    <link rel="stylesheet" href="{{ asset }}/assets/css/banniere.css">
-    <link rel="stylesheet" href="{{ asset }}/assets/css/a-propos.css">
-    <link rel="stylesheet" href="{{ asset }}/assets/css/footer.css">
-   
+  {# Assure-toi que "base" est du type: /Stampee-new/Projet-web1-sprint1 (sans slash final) #}
+  {% set base = base|default('') %}
+  {% set assets_base = base ~ '/public' %}
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  {# --- CSS: toujours depuis /public/assets --- #}
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/variables.css?v=2">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/main.css?v=5">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/components.css?v=3">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/auth.css?v=4">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/admin.css?v=2">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/banniere.css?v=2">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/a-propos.css?v=2">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/footer.css?v=2">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
-
-<body>
-
-<header class="conteneur-en-tete ">
-    <div class="logo">
-        <img src="{{ asset }}/assets/images/logo.png" alt="Logo Lord Stampee">
-        <div class="texte-logo">
-            <span class="lord">LORD</span> <span class="stampee">STAMPEE</span>
-            <p class="slogan">Le royaume de la philatélie</p>
-        </div>
+<body class="{{ body_class|default('page-app') }}">
+<header class="conteneur-en-tete">
+  <div class="logo">
+    <img src="{{ assets_base }}/assets/images/logo.png" alt="Logo Lord Stampee">
+    <div class="texte-logo">
+      <span class="lord">LORD</span> <span class="stampee">STAMPEE</span>
+      <p class="slogan">Le royaume de la philatélie</p>
     </div>
+  </div>
 
-    {% if session.loggedin %}
-        <div class="welcome-user">
-            Bonjour, {{ session.username }}{% if session.privilege == 'admin' %} (Admin){% endif %}
-        </div>
-    {% endif %}
+  {% if session.loggedin %}
+    <div class="welcome-user">
+      Bonjour, {{ session.username }}{% if session.privilege == 'admin' %} (Admin){% endif %}
+    </div>
+  {% endif %}
 
-    <nav class="navigation-haut">
-        <ul>
-            <!-- <li><a href="#">Devenir Membre</a></li> -->
-            <li><a href="#">Blog</a></li>
-            {% if session.privilege == 'superadmin' %}
-            <li><a href="{{ base }}/superadmin-dashboard">SuperAdmin Panel</a></li>
-            {% endif %}
+  <nav class="navigation-haut">
+    <ul>
+      <li><a href="#">Blog</a></li>
 
+      {% if session.privilege == 'superadmin' %}
+        <li><a href="{{ base }}/superadmin-dashboard">SuperAdmin Panel</a></li>
+      {% endif %}
 
-            {% if session.loggedin %}
-                <li><a href="{{ base }}/logout" class="se-connecter">Déconnexion</a></li>
-            {% else %}
-                <li><a href="{{ base }}/login" class="se-connecter">Se Connecter</a></li>
-            {% endif %}
-            
-            <li class="changer-langue">
-                <img src="{{ asset }}/assets/images/canada-flag.png" alt="Drapeau Canada">
-                <label for="langue" class="visually-hidden">Sélectionner la langue :</label>
-                <select id="langue" class="input-select">
-                    <option>FR</option>
-                    <option>EN</option>
-                </select>
-            </li>
-        </ul>
-    </nav>
+      {% if session.loggedin %}
+        <li><a href="{{ base }}/logout" class="se-connecter">Déconnexion</a></li>
+      {% else %}
+        <li><a href="{{ base }}/login" class="se-connecter">Se Connecter</a></li>
+      {% endif %}
+
+      <li class="changer-langue">
+        <img src="{{ assets_base }}/assets/images/canada-flag.png" alt="Drapeau Canada">
+        <label for="langue" class="visually-hidden">Sélectionner la langue :</label>
+        <select id="langue" class="input-select">
+          <option>FR</option>
+          <option>EN</option>
+        </select>
+      </li>
+    </ul>
+  </nav>
 </header>
 
 <!-- Barre de recherche -->

@@ -19,3 +19,29 @@
     --espace-grand: 20px;
     --espace-xl: 30px;
 }
+
+/* ====== Mapping pour auth.css ====== */
+/* Permet à auth.css d'utiliser tes variables existantes */
+
+:root{
+  /* Couleurs principales */
+  --primary: var(--couleur-bleu);
+  --primary-hover: #364ecc;
+  --primary-contrast: #ffffff; 
+
+  /* Surfaces & texte */
+  --card: #ffffff; 
+  --bg: #f5f6fb;   
+  --text: #111111; 
+  --muted: #6b7280;
+
+  /* Bordures & états */
+  --border: var(--couleur-bordure);
+  --error: #b42318;
+  --success: #0f8c3a;
+
+  /* Divers */
+  --shadow: 0 18px 40px rgba(0, 0, 0, .12);
+  --radius: 16px;
+}
+
