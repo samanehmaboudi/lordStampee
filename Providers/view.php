@@ -50,17 +50,16 @@ class View
             self::$twig->addGlobal('session', $_SESSION);
         }
 
-        // On rend toujours "*.twig"
         $tpl = $template . '.twig';
 
-        // (optionnel) fallback si jamais tu as encore des .php le temps de migrer
+       
         $fullTwig = self::$baseDir . DIRECTORY_SEPARATOR . $tpl;
         if (!is_file($fullTwig)) {
-            // dernier recours : essayer .php (temporaire)
+         
             $phpTpl = $template . '.php';
             $fullPhp = self::$baseDir . DIRECTORY_SEPARATOR . $phpTpl;
             if (is_file($fullPhp)) {
-                $tpl = $phpTpl; // Twig peut quand même parser le contenu si c'est du Twig
+                $tpl = $phpTpl;
             }
         }
 
@@ -78,4 +77,7 @@ class View
         header('Location: ' . $base . $path);
         exit;
     }
+
+
+    
 }

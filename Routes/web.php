@@ -25,3 +25,19 @@ Route::post('profil/mot-de-passe',   'ProfileController@updatePassword');  // ma
 // Accueil
 Route::get('/',   'HomeController@index');
 Route::get('home','HomeController@index');
+Route::get('','HomeController@index');
+
+
+
+// Timbres
+Route::get('stamps',         'StampController@index');      // liste
+Route::get('stamps/create',  'StampController@create');     // form ajout
+Route::post('stamps/create', 'StampController@store');      // submit ajout
+
+Route::get('stamps/edit',    'StampController@edit');       
+Route::post('stamps/update', 'StampController@update');     
+Route::post('stamps/delete', 'StampController@destroy');    
+
+// Catalogue public
+Route::get('catalogue',      'StampController@indexPublic');  // liste
+Route::get('fiche-produit',  'StampController@showPublic');   // détail

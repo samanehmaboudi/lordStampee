@@ -123,4 +123,6 @@ class ProfileController
         $_SESSION['flash_ok'] = 'Mot de passe modifié.';
         $this->go('/profil');
     }
+
+    
 }

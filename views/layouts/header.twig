@@ -5,19 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ title|default('Lord Stampee') }}</title>
 
-  {# Assure-toi que "base" est du type: /Stampee-new/Projet-web1-sprint1 (sans slash final) #}
-  {% set base = base|default('') %}
-  {% set assets_base = base ~ '/public' %}
+  
 
-  {# --- CSS: toujours depuis /public/assets --- #}
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/variables.css?v=2">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/main.css?v=5">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/components.css?v=3">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/auth.css?v=4">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/admin.css?v=2">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/banniere.css?v=2">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/a-propos.css?v=2">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/footer.css?v=2">
+  {% if page_css is defined and page_css %}
+  {% for href in page_css %}
+    <link rel="stylesheet" href="{{ href }}">
+  {% endfor %}
+{% endif %}
+
+
+  {# BASE = /mon/projet ; ASSET = BASE + /public (définis dans View) #}
+  {% set assets_base = asset|default(base ~ '/public') %}
+  <base href="{{ base }}/">
+
+  {# CSS — liste complète (adapte aux fichiers présents) #}
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/variable.css">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/general.css">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/header.css">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/grid.css">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/banniere.css">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/banner-devenir-membre.css">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/barre-recherche.css">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/filtre.css">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/carte.css">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/timbres-pagination.css">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/galerie-image.css">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/footer.css">
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/main.css">
+
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -32,21 +47,17 @@
     </div>
   </div>
 
-  {% if session.loggedin %}
-    <div class="welcome-user">
-      Bonjour, {{ session.username }}{% if session.privilege == 'admin' %} (Admin){% endif %}
-    </div>
-  {% endif %}
+
 
   <nav class="navigation-haut">
     <ul>
       <li><a href="#">Blog</a></li>
 
-      {% if session.privilege == 'superadmin' %}
-        <li><a href="{{ base }}/superadmin-dashboard">SuperAdmin Panel</a></li>
-      {% endif %}
+
 
       {% if session.loggedin %}
+        <li><a href="{{ base }}/stamps">Mes timbres</a></li>
+        <li><a href="{{ base }}/stamps/create">Ajouter</a></li>
         <li><a href="{{ base }}/logout" class="se-connecter">Déconnexion</a></li>
       {% else %}
         <li><a href="{{ base }}/login" class="se-connecter">Se Connecter</a></li>

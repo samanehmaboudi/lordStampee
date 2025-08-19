@@ -1,5 +1,11 @@
 {{ include('layouts/header.twig', { title: 'Mon profil' }) }}
 
+{% set assets_base = (asset is defined and asset) ? asset : (base ~ '/public') %}
+<link rel="stylesheet" href="{{ assets_base }}/assets/css/variable.css?v=2">
+<link rel="stylesheet" href="{{ assets_base }}/assets/css/auth.css?v=4">
+{# si tu as mis le bloc dans un fichier séparé: #}
+{# <link rel="stylesheet" href="{{ assets_base }}/assets/css/users.css?v=1"> #}
+
 <section class="auth-wrap">
   <div class="auth-card">
     <h1 class="auth-title">Mon profil</h1>

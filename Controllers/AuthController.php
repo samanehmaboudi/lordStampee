@@ -12,7 +12,7 @@ class AuthController
     {
         if (session_status() === PHP_SESSION_NONE) session_start();
 
-       
+
         if (!empty($_SESSION['loggedin'])) {
             return View::redirect('users');
         }
@@ -48,7 +48,7 @@ class AuthController
                     session_regenerate_id(true);
 
                     // Récupère l’utilisateur pour connaître son id/nom/rôle
-                    $user = $userModel->findByEmail($data['email']); 
+                    $user = $userModel->findByEmail($data['email']);
 
                     // Pose la session (clé standard)
                     $_SESSION['loggedin'] = true;
@@ -68,6 +68,20 @@ class AuthController
         }
 
         return View::render('auth/login', $data);
+    }
+
+
+    function require_login(): void
+    {
+        if (empty($_SESSION['user_id'])) {
+            $_SESSION['error'] = "Connexion requise.";
+            header('Location: /login');
+            exit;
+        }
+    }
+    function current_user_id(): int
+    {
+        return (int)($_SESSION['user_id'] ?? 0);
     }
 
     // Inscription simple
