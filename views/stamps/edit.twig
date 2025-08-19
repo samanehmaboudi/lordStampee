@@ -1,0 +1,116 @@
+{# chemin des assets pour cette page #}
+{% set _assets = (asset is defined and asset) ? asset : (base ~ '/public') %}
+
+{# header + CSS spécifique à la page #}
+{% include 'layouts/header.twig' with {
+  'title': 'Modifier un timbre',
+  'page_css': [_assets ~ '/assets/css/stamps.css?v=1']
+} %}
+
+<main class="container stamp-edit">
+  <h1 class="page-title">Modifier un timbre</h1>
+
+  {% if error %}
+    <p class="alert alert-error">{{ error|e }}</p>
+  {% endif %}
+  {% if success %}
+    <p class="alert alert-success">{{ success|e }}</p>
+  {% endif %}
+
+  <form class="form" action="{{ base }}/stamps/update" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="{{ stamp.id }}">
+
+    <div class="form-group">
+      <label for="name">Nom *</label>
+      <input id="name" name="name" required maxlength="45" value="{{ stamp.name|e }}">
+    </div>
+
+    <div class="form-group">
+      <label for="creationDate">Date *</label>
+      <input id="creationDate" type="date" name="creationDate" required value="{{ stamp.creationDate|e }}">
+    </div>
+
+    <div class="form-group">
+      <label for="country_id">Pays *</label>
+      <select id="country_id" name="country_id" required>
+        {% for c in countries %}
+          <option value="{{ c.id }}" {{ c.id == stamp.country_id ? 'selected' : '' }}>{{ c.name|e }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="category_id">Catégorie *</label>
+      <select id="category_id" name="category_id" required>
+        {% for c in categories %}
+          <option value="{{ c.id }}" {{ c.id == stamp.category_id ? 'selected' : '' }}>{{ c.name|e }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="condition_id">Condition *</label>
+      <select id="condition_id" name="condition_id" required>
+        {% for c in conditions %}
+          <option value="{{ c.id }}" {{ c.id == stamp.condition_id ? 'selected' : '' }}>{{ c.name|e }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="color_id">Couleur (optionnel)</label>
+      <select id="color_id" name="color_id">
+        <option value="">—</option>
+        {% for c in colors %}
+          <option value="{{ c.id }}" {{ stamp.color_id and c.id == stamp.color_id ? 'selected' : '' }}>{{ c.name|e }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    {# ----- IMAGES EXISTANTES : choisir la principale (optionnel) ----- #}
+    {% if images is defined and images|length > 0 %}
+      <fieldset class="fieldset">
+        <legend>Images existantes</legend>
+        <div class="gallery">
+          {% for img in images %}
+            <label class="gallery-item" style="display:inline-block;">
+              <input type="radio"
+                     name="make_main_id"
+                     value="{{ img.id }}"
+                     {% if img.image_type == 'Main' %}checked{% endif %}
+                     style="display:block; margin-bottom:6px;">
+              <img class="gallery-img"
+                   src="{{ _assets }}/assets/images/{{ img.image_url }}"
+                   alt="{{ stamp.name|e }}">
+              <div class="gallery-caption">
+                {{ img.image_type }} • #{{ img.id }}
+              </div>
+            </label>
+          {% endfor %}
+        </div>
+        <p class="note muted">Sélectionne une image pour la définir comme <strong>principale</strong>, ou laisse telle quelle.</p>
+      </fieldset>
+    {% endif %}
+
+    {# ----- AJOUTER DE NOUVELLES IMAGES (optionnel) ----- #}
+    <fieldset class="fieldset">
+      <legend>Ajouter de nouvelles images (optionnel)</legend>
+      <div class="form-group">
+        <input type="file" name="images[]" accept="image/*" multiple>
+        <p class="note">JPG/PNG/WebP — min 300×300 px, max 6 Mo — jusqu’à 10 fichiers.</p>
+      </div>
+      <div class="form-group">
+        <label for="primary_index">Index de l'image principale (parmi les nouvelles)</label>
+        <input id="primary_index" type="number" name="primary_index" min="-1" value="-1">
+        <small class="muted">-1 = ne pas changer la principale via les nouvelles images.</small>
+      </div>
+    </fieldset>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">Enregistrer</button>
+      <a class="btn btn-link" href="{{ base }}/stamps">Annuler</a>
+    </div>
+  </form>
+</main>
+
+{% include 'layouts/footer.twig' %}

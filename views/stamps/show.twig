@@ -1,0 +1,86 @@
+{# Passe un CSS de page au header #}
+{% include 'layouts/header.twig' with {
+  'title': 'Fiche timbre',
+  'page_css': [assets_base ~ '/assets/css/stamps.css?v=1']
+} %}
+
+<main class="stamp-show container">
+  {# messages #}
+  {% if success %}
+    <p class="alert alert-success">{{ success|e }}</p>
+  {% endif %}
+  {% if error %}
+    <p class="alert alert-error">{{ error|e }}</p>
+  {% endif %}
+
+  <h1 class="page-title">
+    Timbre #{{ stamp.id }} — {{ stamp.name|e }}
+  </h1>
+
+  <div class="actions">
+    <a class="btn btn-primary" href="/stamps/edit?id={{ stamp.id }}">Modifier</a>
+
+    <form class="inline" action="/stamps/delete" method="post" onsubmit="return confirm('Supprimer ce timbre ?');">
+      <input type="hidden" name="id" value="{{ stamp.id }}">
+      <button class="btn btn-danger" type="submit">Supprimer</button>
+    </form>
+
+    <a class="btn btn-link" href="/stamps">↩ Retour à la liste</a>
+  </div>
+
+  <section class="block">
+    <h2 class="block-title">Détails</h2>
+    <table class="table">
+      <tr>
+        <th>Nom</th>
+        <td>{{ stamp.name|e }}</td>
+      </tr>
+      <tr>
+        <th>Date de création</th>
+        <td>{{ stamp.creationDate|e }}</td>
+      </tr>
+      <tr>
+        <th>Pays</th>
+        <td>{{ (stamp.country ?? stamp.country_id ?? '—')|e }}</td>
+      </tr>
+      <tr>
+        <th>Catégorie</th>
+        <td>{{ (stamp.category ?? stamp.category_id ?? '—')|e }}</td>
+      </tr>
+      <tr>
+        <th>Condition</th>
+        <td>{{ (stamp.cond ?? stamp.condition_id ?? '—')|e }}</td>
+      </tr>
+      <tr>
+        <th>Couleur</th>
+        <td>{{ (stamp.color ?? stamp.color_id ?? '—')|e }}</td>
+      </tr>
+      <tr>
+        <th>Propriétaire (User_id)</th>
+        <td>{{ stamp.User_id }}</td>
+      </tr>
+    </table>
+  </section>
+
+  <section class="block">
+    <h2 class="block-title">Images</h2>
+    {% if images is not empty %}
+      <div class="gallery">
+        {% for img in images %}
+          <figure class="gallery-item">
+            <img
+              src="{{ assets_base }}/assets/images/{{ img.image_url }}"
+              alt="{{ stamp.name|e }}"
+              class="gallery-img"
+            >
+            <figcaption class="gallery-caption">{{ img.image_type }}</figcaption>
+          </figure>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">Aucune image.</p>
+    {% endif %}
+  </section>
+</main>
+
+{% include 'layouts/footer.twig' %}

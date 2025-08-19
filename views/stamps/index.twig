@@ -1,0 +1,64 @@
+{# assets base #}
+{% set _assets = (asset is defined and asset) ? asset : (base ~ '/public') %}
+
+{% include 'layouts/header.twig' with {
+  'title': 'Mes timbres',
+  'page_css': [_assets ~ '/assets/css/stamps.css?v=2']   # <-- charge le CSS
+} %}
+
+<main class="container stamp-index">
+  <div class="page-header">
+    <h1 class="page-title">Mes timbres</h1>
+    <a class="btn btn-primary" href="{{ base }}/stamps/create">+ Ajouter un timbre</a>
+  </div>
+
+  {% if success %}
+    <p class="alert alert-success">{{ success|e }}</p>
+  {% endif %}
+  {% if error %}
+    <p class="alert alert-error">{{ error|e }}</p>
+  {% endif %}
+
+  {% if stamps is empty %}
+    <div class="empty">
+      <p>Aucun timbre pour l’instant.</p>
+      <a class="btn btn-primary" href="{{ base }}/stamps/create">Créer mon premier timbre</a>
+    </div>
+  {% else %}
+    <div class="table-wrap">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Pays</th>
+            <th>Catégorie</th>
+            <th>Date</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in stamps %}
+          <tr>
+            <td>{{ s.id }}</td>
+            <td>{{ s.name|e }}</td>
+            <td>{{ (s.country ?? '—')|e }}</td>
+            <td>{{ (s.category ?? '—')|e }}</td>
+            <td>{{ s.creationDate|e }}</td>
+            <td class="actions">
+              <a class="btn btn-sm" href="{{ base }}/stamps/edit?id={{ s.id }}">Modifier</a>
+              <form class="inline" action="{{ base }}/stamps/delete" method="post"
+                    onsubmit="return confirm('Supprimer ce timbre ?');">
+                <input type="hidden" name="id" value="{{ s.id }}">
+                <button class="btn btn-sm btn-danger" type="submit">Supprimer</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</main>
+
+{% include 'layouts/footer.twig' %}

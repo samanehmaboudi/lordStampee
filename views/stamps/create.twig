@@ -1,0 +1,109 @@
+
+select { position: relative; z-index: 1; pointer-events: auto; }
+
+{# DEBUG TEMP #}
+<p style="color:#888">
+  countries={{ countries is defined ? countries|length : 'undef' }},
+  categories={{ categories is defined ? categories|length : 'undef' }},
+  conditions={{ conditions is defined ? conditions|length : 'undef' }},
+  colors={{ colors is defined ? colors|length : 'undef' }}
+</p>
+
+
+
+
+{# debug #}
+{# Countries: {{ countries|length }}, Categories: {{ categories|length }}, Conditions: {{ conditions|length }}, Colors: {{ colors|length }} #}
+
+
+
+{# Chemin assets pour construire l'URL du CSS de page #}
+{% set _assets = (asset is defined and asset) ? asset : (base ~ '/public') %}
+
+{# Header + chargement du CSS spécifique à cette page #}
+{% include 'layouts/header.twig' with {
+  'title': 'Créer un timbre',
+  'page_css': [_assets ~ '/assets/css/stamps.css?v=1']
+} %}
+
+<main class="container stamp-create">
+  <h1 class="page-title">Ajouter un timbre</h1>
+
+  {% if error %}
+    <p class="alert alert-error">{{ error|e }}</p>
+  {% endif %}
+  {% if success %}
+    <p class="alert alert-success">{{ success|e }}</p>
+  {% endif %}
+
+  <form class="form" action="{{ base }}/stamps/create" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="name">Nom du timbre *</label>
+      <input id="name" name="name" required maxlength="45">
+    </div>
+
+    <div class="form-group">
+      <label for="creationDate">Date de création *</label>
+      <input id="creationDate" type="date" name="creationDate" required>
+    </div>
+
+    <div class="form-group">
+      <label for="country_id">Pays *</label>
+      <select id="country_id" name="country_id" required>
+        
+        {% for c in countries %}
+          <option value="{{ c.id }}">{{ c.name|e }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="category_id">Catégorie *</label>
+      <select id="category_id" name="category_id" required>
+        {% for c in categories %}
+          <option value="{{ c.id }}">{{ c.name|e }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="condition_id">Condition *</label>
+      <select id="condition_id" name="condition_id" required>
+        {% for c in conditions %}
+          <option value="{{ c.id }}">{{ c.name|e }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="color_id">Couleur (optionnel)</label>
+      <select id="color_id" name="color_id">
+        <option value="">—</option>
+        {% for c in colors %}
+          <option value="{{ c.id }}">{{ c.name|e }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <fieldset class="fieldset">
+      <legend>Images *</legend>
+      <div class="form-group">
+        <input type="file" name="images[]" accept="image/*" multiple required>
+        <p class="note">Formats acceptés : JPG/PNG/WebP. Vous pouvez sélectionner plusieurs fichiers.</p>
+      </div>
+      <div class="form-group">
+        <label for="primary_index">Index de l'image principale</label>
+        <input id="primary_index" type="number" name="primary_index" min="0" value="0">
+      </div>
+    </fieldset>
+
+   
+
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">Enregistrer</button>
+      <a class="btn btn-link" href="{{ base }}/stamps">Annuler</a>
+    </div>
+  </form>
+</main>
+
+{% include 'layouts/footer.twig' %}
