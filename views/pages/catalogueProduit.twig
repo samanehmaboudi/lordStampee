@@ -1,4 +1,24 @@
-{% include 'layouts/header.twig' %}
+{# chemins sûrs #}
+{% set base_default = '/Stampee-new/Projet-web1-sprint1' %} {# <= adapte à ton sous-dossier ('' si racine) #}
+{% set base  = base  | default(base_default) %}
+{% set asset = asset | default(base ~ '/public') %}
+{% set assets_base = assets_base | default(asset) %}
+
+{% include 'layouts/header.twig' with {
+  title: 'Catalogue',
+  page_css: [
+    assets_base ~ '/assets/css/grid.css?v=1',
+    assets_base ~ '/assets/css/filtre.css?v=1',
+    assets_base ~ '/assets/css/barre-recherche.css?v=1',
+    assets_base ~ '/assets/css/banner-devenir-membre.css?v=1',
+    assets_base ~ '/assets/css/timbres-pagination.css?v=1',
+    assets_base ~ '/assets/css/carte.css?v=1'
+  ]
+} %}
+
+
+
+
 
 <main>
   <div class="aaa">
@@ -168,14 +188,31 @@
           {% for s in stamps %}
             <article class="carte">
               {# Lien overlay vers la fiche (query-string, comme tu l'utilises) #}
-             <a href="{{ base }}/fiche-produit?id={{ s.id }}" class="lien-produit">Voir plus de détails</a>
+             <a href="{{ base }}/fich_produit?id={{ s.id }}" class="lien-produit">Voir plus de détails</a>
 
-              <figure class="carte-image">
-                {% set img = s.main_image
-                  ? (asset ~ '/assets/images/' ~ s.main_image)
-                  : (asset ~ '/assets/images/placeholder-stamp.jpg') %}
-                <img src="{{ img }}" alt="{{ s.name|e }}">
-              </figure>
+
+
+<figure class="carte-image">
+  {% set raw = s.main_image|default('') %}
+
+  {% if raw starts with 'uploads/' %}
+    {# Cas upload: on concatène la racine /public + /assets/images/ + chemin BD #}
+    {% set img_src = assets_base ~ '/assets/images/' ~ raw %}
+  {% elseif raw %}
+    {# Cas ancien: un simple nom présent dans img-catalogue #}
+    {% set img_src = assets_base ~ '/assets/images/img-catalogue/' ~ raw %}
+  {% else %}
+    {# Fallback défaut #}
+    {% set img_src = assets_base ~ '/assets/images/img-catalogue/photo-GB-1840.jpg' %}
+  {% endif %}
+
+  <img
+    src="{{ img_src }}"
+    alt="{{ s.name|e }}"
+    onerror="this.onerror=null; this.src='{{ assets_base }}/assets/images/img-catalogue/photo-GB-1840.jpg';">
+</figure>
+
+
 
               <div class="carte-details">
                 <h3 class="carte-titre">{{ s.name|e }}</h3>
@@ -188,7 +225,7 @@
                 <button aria-label="Ajouter aux favoris">
                   <i class="fa-regular fa-heart"></i>
                 </button>
-                <a href="{{ base }}/fiche-produit?id={{ s.id }}" aria-label="Voir plus de détails">
+                <a href="{{ base }}/fichierProduit?id={{ s.id }}" aria-label="Voir plus de détails">
                   <i class="fa-solid fa-arrow-right"></i>
                 </a>
               </nav>

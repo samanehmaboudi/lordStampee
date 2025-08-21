@@ -40,4 +40,4 @@ Route::post('stamps/delete', 'StampController@destroy');
 
 // Catalogue public
 Route::get('catalogue',      'StampController@indexPublic');  // liste
-Route::get('fiche-produit',  'StampController@showPublic');   // détail
+Route::get('catologue',  'StampController@showPublic');   // détail

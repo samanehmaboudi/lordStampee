@@ -1,72 +1,83 @@
 <?php
-
 namespace App\Routes;
 
-class Route
+final class Route
 {
-    public static array $routes = [];
+    private static array $routes = [
+        'GET'  => [],
+        'POST' => [],
+    ];
 
-    /**
-     * Déclare une route GET
-     */
-    public static function get(string $page, string $callback): void
+    public static function get(string $uri, $action): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            self::$routes[$page] = $callback;
-        }
+        self::$routes['GET'][self::normalize($uri)] = $action;
     }
 
-    /**
-     * Déclare une route POST
-     */
-    public static function post(string $page, string $callback): void
+    public static function post(string $uri, $action): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            self::$routes[$page] = $callback;
-        }
+        self::$routes['POST'][self::normalize($uri)] = $action;
     }
 
-    /**
-     * Résout la route demandée
-     */
+    private static function normalize(?string $uri): string
+    {
+        $uri = (string)$uri;
+        // retire query string si présent
+        if (strpos($uri, '?') !== false) {
+            $uri = parse_url($uri, PHP_URL_PATH) ?? '/';
+        }
+        // force un seul slash de tête + retire les slashes de fin
+        $uri = '/' . ltrim($uri, '/');
+        $uri = rtrim($uri, '/');
+        if ($uri === '') $uri = '/';
+        return $uri;
+    }
+
     public static function resolve(): void
     {
-        // 1) Récupère le chemin sans la query string
-        $uri = $_SERVER['PATH_INFO'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-        // 2) Retire le prefix BASE si présent (ex: /Stampee-new/Projet-web1-sprint1)
-        $base = defined('BASE') ? rtrim(BASE, '/') : '';
-        if ($base && str_starts_with($uri, $base)) {
-            $uri = substr($uri, strlen($base));
+        // chemin demandé (sans query)
+        $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+
+        // base path = sous-dossier où se trouve index.php (ex: /Stampee-new/Projet-web1-sprint1)
+        $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+        if ($base && strpos($requestPath, $base) === 0) {
+            $requestPath = substr($requestPath, strlen($base));
         }
 
-        // 3) Normalise
-        $page = trim($uri, '/');
-        if ($page === '') {
-            $page = 'accueil';
+        $uri = self::normalize($requestPath);  // IMPORTANT: '/' pour la racine
+
+        $action = self::$routes[$method][$uri] ?? null;
+        if (!$action && $uri !== '/') {
+            // tente aussi sans slash final (sécurité)
+            $alt = rtrim($uri, '/');
+            $action = self::$routes[$method][$alt === '' ? '/' : $alt] ?? null;
         }
 
-        // 4) Essaie sans/avec slash final
-        if (!isset(self::$routes[$page])) {
-            $alt = rtrim($page, '/');
-            if (isset(self::$routes[$alt])) {
-                $page = $alt;
-            }
-        }
-
-        // 5) Résolution
-        if (isset(self::$routes[$page])) {
-            [$controller, $method] = explode('@', self::$routes[$page], 2);
-            $controllerClass = "App\\Controllers\\$controller";
-            if (class_exists($controllerClass) && method_exists($controllerClass, $method)) {
-                $instance = new $controllerClass;
-                $instance->$method();
-                return;
-            }
-            echo "Erreur : méthode ou contrôleur introuvable.";
-        } else {
+        if (!$action) {
             http_response_code(404);
             echo "404 - Page non trouvée.";
+            return;
         }
+
+        // action: "HomeController@index" ou [ClassName::class, 'method'] ou Closure
+        if (is_string($action) && strpos($action, '@') !== false) {
+            [$ctrl, $meth] = explode('@', $action, 2);
+            $fqcn = '\\App\\Controllers\\' . ltrim($ctrl, '\\');
+            (new $fqcn())->{$meth}();
+            return;
+        }
+        if (is_array($action)) {
+            [$fqcn, $meth] = $action;
+            (new $fqcn())->{$meth}();
+            return;
+        }
+        if ($action instanceof \Closure) {
+            $action();
+            return;
+        }
+
+        http_response_code(500);
+        echo "500 - Action de route invalide.";
     }
 }

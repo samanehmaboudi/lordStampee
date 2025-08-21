@@ -1,19 +1,8 @@
 
-select { position: relative; z-index: 1; pointer-events: auto; }
-
-{# DEBUG TEMP #}
-<p style="color:#888">
-  countries={{ countries is defined ? countries|length : 'undef' }},
-  categories={{ categories is defined ? categories|length : 'undef' }},
-  conditions={{ conditions is defined ? conditions|length : 'undef' }},
-  colors={{ colors is defined ? colors|length : 'undef' }}
-</p>
 
 
 
 
-{# debug #}
-{# Countries: {{ countries|length }}, Categories: {{ categories|length }}, Conditions: {{ conditions|length }}, Colors: {{ colors|length }} #}
 
 
 
@@ -43,8 +32,9 @@ select { position: relative; z-index: 1; pointer-events: auto; }
     </div>
 
     <div class="form-group">
-      <label for="creationDate">Date de création *</label>
-      <input id="creationDate" type="date" name="creationDate" required>
+      <label for="creationYear">Année de création *</label>
+      <input id="creationYear" type="number" name="creationYear"
+         min="1800" max="2025" step="1" required>
     </div>
 
     <div class="form-group">

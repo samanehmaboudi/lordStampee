@@ -2,18 +2,7 @@
 
 
 <main>
-    {% if session.privilege == 'admin' %}
-        <div class="admin-message">
-            <h2>Bienvenue, Admin {{ session.username }} </h2>
-            <p>Accédez à l’espace de gestion :</p>
-            <a href="{{ base }}/dashboard" class="btn">Aller au tableau de bord</a>
-        </div>
-    {% else %}
-        <div class="user-message">
- 
 
-        </div>
-    {% endif %}
     
      <!-- Bannière principale -->
         <section class="banniere">

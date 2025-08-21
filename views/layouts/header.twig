@@ -1,59 +1,60 @@
+{# === Chemins de base (UNE seule fois) === #}
+{# base  : racine de ton app (ex: /Stampee-new/Projet-web1-sprint1) #}
+{# assets: racine publique /public (ne pas mettre /public dans "base") #}
+{% set base        = (base  is defined and base)  ? base  : '/Stampee-new/Projet-web1-sprint1' %}
+{% set assets_base = (asset is defined and asset) ? asset : base ~ '/public' %}
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ title|default('Lord Stampee') }}</title>
 
-  
+  {# ⚠️ Ne pas utiliser <base href> pour éviter les 404 #}
+  {# <base href="{{ base }}/"> #}
 
+  {# --- CSS globaux --- #}
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/variable.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/general.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/header.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/grid.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/banniere.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/banner-devenir-membre.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/barre-recherche.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/filtre.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/carte.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/timbres-pagination.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/galerie-image.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/menu-principal-deroulant.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/timbres-search-bar.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/footer.css" />
+  <link rel="stylesheet" href="{{ assets_base }}/assets/css/main.css" />
+
+  {# --- CSS de page (optionnels) : chargés APRÈS --- #}
   {% if page_css is defined and page_css %}
-  {% for href in page_css %}
-    <link rel="stylesheet" href="{{ href }}">
-  {% endfor %}
-{% endif %}
-
-
-  {# BASE = /mon/projet ; ASSET = BASE + /public (définis dans View) #}
-  {% set assets_base = asset|default(base ~ '/public') %}
-  <base href="{{ base }}/">
-
-  {# CSS — liste complète (adapte aux fichiers présents) #}
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/variable.css">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/general.css">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/header.css">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/grid.css">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/banniere.css">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/banner-devenir-membre.css">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/barre-recherche.css">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/filtre.css">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/carte.css">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/timbres-pagination.css">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/galerie-image.css">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/footer.css">
-  <link rel="stylesheet" href="{{ assets_base }}/assets/css/main.css">
-
+    {% for href in page_css %}
+      <link rel="stylesheet" href="{{ href }}" />
+    {% endfor %}
+  {% endif %}
 
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
+
 <body class="{{ body_class|default('page-app') }}">
 <header class="conteneur-en-tete">
   <div class="logo">
-    <img src="{{ assets_base }}/assets/images/logo.png" alt="Logo Lord Stampee">
+    <img src="{{ assets_base }}/assets/images/logo.png" alt="Logo Lord Stampee" />
     <div class="texte-logo">
       <span class="lord">LORD</span> <span class="stampee">STAMPEE</span>
       <p class="slogan">Le royaume de la philatélie</p>
     </div>
   </div>
 
-
-
   <nav class="navigation-haut">
     <ul>
       <li><a href="#">Blog</a></li>
-
-
 
       {% if session.loggedin %}
         <li><a href="{{ base }}/stamps">Mes timbres</a></li>
@@ -64,7 +65,7 @@
       {% endif %}
 
       <li class="changer-langue">
-        <img src="{{ assets_base }}/assets/images/canada-flag.png" alt="Drapeau Canada">
+        <img src="{{ assets_base }}/assets/images/canada-flag.png" alt="Drapeau Canada" />
         <label for="langue" class="visually-hidden">Sélectionner la langue :</label>
         <select id="langue" class="input-select">
           <option>FR</option>
@@ -74,6 +75,7 @@
     </ul>
   </nav>
 </header>
+
 
 <!-- Barre de recherche -->
 <div class="barre-recherche">

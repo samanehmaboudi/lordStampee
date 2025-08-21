@@ -38,15 +38,17 @@ body.page-auth {
 
 /* Liens */
 a {
-  color: var(--primary, #455fe4);
+  color: #ffffff;
   text-decoration: none;
+  padding: 10px;
+  background: #b0975c;
 }
 a:hover,
 a:focus-visible { text-decoration: underline; }
 
 /* 3) Barre de nav minimale (facultatif) */
 .nav-auth {
-  background: #fff;
+  background: #ffffff;
   border-bottom: 1px solid var(--border, #e3e6ef);
 }
 .nav-auth ul {
