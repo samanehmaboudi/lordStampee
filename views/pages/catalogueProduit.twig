@@ -188,29 +188,23 @@
           {% for s in stamps %}
             <article class="carte">
               {# Lien overlay vers la fiche (query-string, comme tu l'utilises) #}
-             <a href="{{ base }}/fich_produit?id={{ s.id }}" class="lien-produit">Voir plus de détails</a>
+             <a href="{{ base }}/fiche-produit?id={{ s.id }} class="lien-produit">Voir plus de détails</a>
+
+            <figure class="carte-image">
+          
+
+         {% set raw = s.main_image|default('') %} {# ou img.image_url #}
+          {% if raw %}
+          {% set img_src = asset ~ '/' ~ raw %}  {# => /public/uploads/2025/08/fee0885ed6e83d11.jpg #}
+          {% else %}
+          {% set img_src = asset ~ '/assets/images/img-catalogue/photo-GB-1840.jpg' %}
+          {% endif %}
+
+            <img src="{{ img_src }}" alt="{{ s.name|e }}"
+            onerror="this.onerror=null;this.src='{{ asset }}/assets/images/img-catalogue/photo-GB-1840.jpg'">
+            </figure>
 
 
-
-<figure class="carte-image">
-  {% set raw = s.main_image|default('') %}
-
-  {% if raw starts with 'uploads/' %}
-    {# Cas upload: on concatène la racine /public + /assets/images/ + chemin BD #}
-    {% set img_src = assets_base ~ '/assets/images/' ~ raw %}
-  {% elseif raw %}
-    {# Cas ancien: un simple nom présent dans img-catalogue #}
-    {% set img_src = assets_base ~ '/assets/images/img-catalogue/' ~ raw %}
-  {% else %}
-    {# Fallback défaut #}
-    {% set img_src = assets_base ~ '/assets/images/img-catalogue/photo-GB-1840.jpg' %}
-  {% endif %}
-
-  <img
-    src="{{ img_src }}"
-    alt="{{ s.name|e }}"
-    onerror="this.onerror=null; this.src='{{ assets_base }}/assets/images/img-catalogue/photo-GB-1840.jpg';">
-</figure>
 
 
 

@@ -32,38 +32,47 @@ class StampController
         return (int)($_SESSION['user_id'] ?? 0);
     }
 
-    /** Dossier absolu des uploads du mois courant, ex: /.../public/assets/images/uploads/2025/08 */
+    /** Dossier absolu des uploads du mois courant, ex: /.../public/uploads/2025/08 */
     private function currentUploadsDir(): string
     {
         $subdir = date('Y/m');
-        $base   = __DIR__ . '/../../public/assets/images/uploads/' . $subdir;
+        $base   = __DIR__ . '/../../public/uploads/' . $subdir;   
         if (!is_dir($base)) {
             @mkdir($base, 0775, true);
         }
         return $base;
     }
 
-    /** Renvoie le chemin relatif à stocker en BD (uploads/YYYY/MM/filename.ext) */
+    /** Chemin relatif à stocker en BD (uploads/YYYY/MM/filename.ext) */
     private function makeRelPath(string $filename): string
     {
         return 'uploads/' . date('Y/m') . '/' . $filename;
     }
 
-    /** Sauve 1 fichier uploadé tel quel, renvoie le chemin relatif BD ou null */
+    /** Sauve 1 fichier uploadé tel quel, renvoie le chemin relatif BD ou null (avec logs en cas d’échec) */
     private function moveOneUpload(string $tmp, string $originalName): ?string
     {
         $dir      = $this->currentUploadsDir();
         $ext      = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
-        if (!in_array($ext, ['jpg','jpeg','png','webp'], true)) {
+        if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
             $ext = 'jpg';
         }
-        
         $filename = bin2hex(random_bytes(8)) . '.' . $ext;
         $dest     = $dir . '/' . $filename;
 
+        if (!is_uploaded_file($tmp)) {
+            error_log("UPLOAD ERROR: not an uploaded file: $tmp");
+            return null;
+        }
+
         if (move_uploaded_file($tmp, $dest)) {
+            if (!file_exists($dest)) {
+                error_log("UPLOAD MOVED BUT NOT FOUND: $dest");
+            }
             return $this->makeRelPath($filename); // ex: uploads/2025/08/ab12cd34.jpg
         }
+
+        error_log("MOVE FAILED: $tmp -> $dest");
         return null;
     }
 
@@ -72,14 +81,18 @@ class StampController
     {
         $count = count($files['name']);
         for ($i = 0; $i < $count; $i++) {
-            if ($files['error'][$i] !== UPLOAD_ERR_OK) continue;
+            if (($files['error'][$i] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+                error_log("UPLOAD ERROR index=$i code=" . ($files['error'][$i] ?? 'n/a'));
+                continue;
+            }
             $rel = $this->moveOneUpload($files['tmp_name'][$i], $files['name'][$i]);
             if ($rel) {
                 $role = ($i === $primaryIndex) ? 'Main' : 'Additional';
-                (new Image())->create($stampId, $rel, $role);
+                (new \App\Models\Image())->create($stampId, $rel, $role);
             }
         }
     }
+
 
     /* ==================== Vues ==================== */
 
@@ -144,7 +157,7 @@ class StampController
         return View::render('stamps/index', $data);
     }
 
-/* ==================== update==================== */
+    /* ==================== update==================== */
 
     public function edit()
     {
@@ -231,7 +244,7 @@ class StampController
         return View::redirect('stamps');
     }
 
-       /* ==================== supprime ==================== */
+    /* ==================== supprime ==================== */
 
     public function destroy()
     {
@@ -269,7 +282,7 @@ class StampController
 
     /* ==================== PUBLIC ==================== */
 
- 
+
     public function indexPublic()
     {
         if (session_status() === PHP_SESSION_NONE) session_start();
@@ -301,7 +314,7 @@ class StampController
         ]);
     }
 
-   /* ====================catologueProduit ==================== */
+    /* ====================catologueProduit ==================== */
     public function showPublic($id = null)
     {
         if ($id === null && isset($_GET['id'])) {
@@ -348,6 +361,4 @@ class StampController
             'base'   => $GLOBALS['base']  ?? '',
         ]);
     }
-
-    
 }

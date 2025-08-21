@@ -1,6 +1,7 @@
 {# === Chemins de base (UNE seule fois) === #}
 {# base  : racine de ton app (ex: /Stampee-new/Projet-web1-sprint1) #}
 {# assets: racine publique /public (ne pas mettre /public dans "base") #}
+{# racine app & /public #}
 {% set base        = (base  is defined and base)  ? base  : '/Stampee-new/Projet-web1-sprint1' %}
 {% set assets_base = (asset is defined and asset) ? asset : base ~ '/public' %}
 
@@ -11,7 +12,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ title|default('Lord Stampee') }}</title>
 
-  {# ⚠️ Ne pas utiliser <base href> pour éviter les 404 #}
   {# <base href="{{ base }}/"> #}
 
   {# --- CSS globaux --- #}
