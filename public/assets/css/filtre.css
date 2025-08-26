@@ -1,133 +1,200 @@
+/* ===================== */
+/* Panneau filtres       */
+/* ===================== */
 
 .filtre-container {
-    width: 280px;
-    background: #F9F8F6;
-    padding: 20px;
-    border-radius: 8px;
-    font-family: Arial, sans-serif;
-    border: 1px solid #D1D1D1;
+  width: 280px;
+  background: #F9F8F6;
+  padding: 20px;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  border: 1px solid #D1D1D1;
 }
-
 
 .filtre-container h3 {
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    padding-bottom: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  position: relative;
 }
-
 
 .filtre-container h3::before {
-    content: "";
-    display: block;
-    width: 100%;
-    height: 1px;
-    background: #000;
-    margin-top: 5px;
+  content: "";
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: -2px;
+  height: 2px;
+  background: #000;
+  opacity: .15;
 }
-
 
 .filtre-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-    
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
 }
-
 
 .filtre-container label {
-    font-weight:400;
-    font-size: 14px;
-    margin-bottom: 5px;
-    color: #0f0e0e;
-    text-align: left;
+  font-weight: 400;
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: #0f0e0e;
+  text-align: left;
 }
-
 
 .filtre-range {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-
-    color: #333;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: 14px;
+  color: #333;
 }
-
 
 .filtre-range input[type="range"] {
-    width: 100%;
-    background: #D1E1FA;
-    height: 5px;
-    border-radius: 5px;
-    outline: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 5px;
+  outline: none;
+  -webkit-appearance: none;
+  background: #D1E1FA;           /* piste */
 }
-
-
 .filtre-range input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 12px;
-    height: 12px;
-    background: black;
-    border-radius: 50%;
-    cursor: pointer;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #111;
+  border-radius: 50%;
+  cursor: pointer;
 }
-
+.filtre-range input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #111;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
 
 .filtre-container select {
-    width: 100%;
-    padding: 5px;
-    border: 1px solid #555;
-
-    border-radius: 5px;
-    font-size: 14px;
-    background: #D1E1FA;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #D1E1FA;
 }
 
-
-
-.filtre-section legend {
-    font-size: 14px;
-    font-weight: bold;
-    color: #222;
-    margin-bottom: 8px;
-    position: relative;
-    padding-left: 20px;
-}
-
-
-
-/* Espacement entre les sections */
+/* Sections / checkboxes */
 .filtre-section {
-    border: none;
-    margin-bottom: 15px;
+  border: none;
+  margin-bottom: 15px;
+}
+.filtre-section:not(:last-child) {
+  border-bottom: 1px solid #D1D1D1;
+  padding-bottom: 10px;
+}
+.filtre-section legend {
+  font-size: 14px;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 8px;
+  position: relative;
+  padding-left: 0;
 }
 
-
-.checkbox-group {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 5px;
+.checkbox-group,
+.checkline {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  margin: .25rem 0;
 }
-
-
 
 .filtre-container input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
 }
 
+.valfix { display:inline-block; min-width:12ch; text-align:right; }
 
-.filtre-section:not(:last-child) {
-    border-bottom: 1px solid #D1D1D1;
-    padding-bottom: 10px;
+/* ===================== */
+/* Actions (boutons)     */
+/* ===================== */
+
+.filtre-actions {
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+  margin-top: .5rem;
+}
+
+/* bouton principal "Appliquer" */
+.filtre-container .btn-appliquer {
+  --btn-bg: #1f6feb;
+  --btn-bg-hover: #1a5fd0;
+  --btn-bg-active: #174fb3;
+  --btn-ring: rgba(31,111,235,.35);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .55rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background: var(--btn-bg);
+  color: #fff;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  transition: background .15s ease, transform .1s ease, box-shadow .15s ease;
+}
+
+.filtre-container .btn-appliquer:hover {
+  background: var(--btn-bg-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(31,111,235,.25);
+}
+
+.filtre-container .btn-appliquer:active {
+  background: var(--btn-bg-active);
+  transform: translateY(0);
+  box-shadow: 0 3px 12px rgba(31,111,235,.3);
+}
+
+.filtre-container .btn-appliquer:focus-visible {
+  outline: 3px solid var(--btn-ring);
+  outline-offset: 2px;
+}
+
+.filtre-container .btn-appliquer:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+/* lien "Réinitialiser" style bouton texte */
+.filtre-container .btn-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .45rem .6rem;
+  border-radius: 9999px;
+  color: #374151;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background .15s ease, color .15s ease;
+}
+.filtre-container .btn-reset:hover { background: #f3f4f6; }
+.filtre-container .btn-reset:active { background: #e5e7eb; }
+.filtre-container .btn-reset:focus-visible {
+  outline: 3px solid rgba(55,65,81,.25);
+  outline-offset: 2px;
 }

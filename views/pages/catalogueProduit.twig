@@ -1,8 +1,21 @@
 {# chemins sûrs #}
-{% set base_default = '/Stampee-new/Projet-web1-sprint1' %} {# <= adapte à ton sous-dossier ('' si racine) #}
-{% set base  = base  | default(base_default) %}
-{% set asset = asset | default(base ~ '/public') %}
+{% set base_default = '/Stampee-new/Projet-web1-sprint1' %}
+{% set base        = base  | default(base_default) %}
+{% set asset       = asset | default(base ~ '/public') %}
 {% set assets_base = assets_base | default(asset) %}
+
+{# valeurs par défaut pour l'UI si le contrôleur n'envoie pas #}
+{% set filters = filters | default({
+  year_min: 1750,
+  year_max: 2024,
+  country_id: '',
+  price_min: 0,
+  price_max: 7500,
+  sort: 'newest',
+  condition_id: []   # multi-conditions cochées
+}) %}
+{% set countries  = countries  | default([]) %}
+{% set conditions = conditions | default([]) %}
 
 {% include 'layouts/header.twig' with {
   title: 'Catalogue',
@@ -19,118 +32,77 @@
 <main>
   <div class="aaa">
 
-    <div class="filtre-container">
+    {# ===================== Filtres ===================== #}
+    <form class="filtre-container" id="filters" method="get" action="{{ base }}/catalogue">
       <h3>Filtrer les timbres</h3>
 
       <!-- Année d'émission -->
       <div class="filtre-group">
-        <label for="filtre-annee">Année d’émission</label>
+        <label>Année d’émission</label>
         <div class="filtre-range">
-          <input type="range" id="filtre-annee" name="filtre-annee" min="1850" max="2024" value="1850">
-          <span>1850</span> - <span>2024</span>
+          <input type="range" name="year_min" id="year_min" min="1700" max="2024"
+                 value="{{ filters.year_min }}" data-autosubmit>
+          <input type="range" name="year_max" id="year_max" min="1700" max="2024"
+                 value="{{ filters.year_max }}" data-autosubmit>
+          <span id="lblYears" class="valfix">{{ filters.year_min }} - {{ filters.year_max }}</span>
         </div>
       </div>
 
       <!-- Pays d'origine -->
       <div class="filtre-group">
-        <label for="filtre-pays">Pays d'origine</label>
-        <select id="filtre-pays" name="filtre-pays">
-          <option value="">recherche</option>
-          <option value="canada">Canada</option>
-          <option value="usa">USA</option>
-          <option value="france">France</option>
+        <label for="country_id">Pays d'origine</label>
+        <select id="country_id" name="country_id" data-autosubmit>
+          <option value="">Tous</option>
+          {% for c in countries %}
+            <option value="{{ c.id }}" {{ c.id == filters.country_id ? 'selected' : '' }}>{{ c.name }}</option>
+          {% endfor %}
         </select>
       </div>
 
-      <!-- Filtrer par Prix -->
+      <!-- Prix -->
       <div class="filtre-group">
-        <label for="filtre-prix">Filtrer par Prix</label>
+        <label>Filtrer par prix</label>
         <div class="filtre-range">
-          <input type="range" id="filtre-prix" name="filtre-prix" min="0" max="7500" value="0">
-          <span>0$</span> - <span>7500$</span>
+          <input type="range" name="price_min" id="price_min" min="0" max="10000" step="0.5"
+                 value="{{ filters.price_min }}" data-autosubmit>
+          <input type="range" name="price_max" id="price_max" min="0" max="10000" step="0.5"
+                 value="{{ filters.price_max }}" data-autosubmit>
+          <span id="lblPrices" class="valfix">{{ filters.price_min }}$ - {{ filters.price_max }}$</span>
         </div>
       </div>
 
-      <!-- Catégories -->
-      <fieldset class="filtre-section">
-        <legend>Catégories</legend>
-        <div class="checkbox-group">
-          <label for="filtre-historiques">Historiques</label>
-          <input type="checkbox" id="filtre-historiques">
-        </div>
-        <div class="checkbox-group">
-          <label for="filtre-modernes">Modernes</label>
-          <input type="checkbox" id="filtre-modernes">
-        </div>
-        <div class="checkbox-group">
-          <label for="filtre-commemoratifs">Commémoratifs</label>
-          <input type="checkbox" id="filtre-commemoratifs">
-        </div>
-        <div class="checkbox-group">
-          <label for="filtre-rares">Timbres rares / édition limitée</label>
-          <input type="checkbox" id="filtre-rares">
-        </div>
-        <div class="checkbox-group">
-          <label for="filtre-animaux">Animaux et nature</label>
-          <input type="checkbox" id="filtre-animaux">
-        </div>
-      </fieldset>
-
-      <!-- Condition (État du timbre) -->
+      <!-- Condition (multi) -->
       <fieldset class="filtre-section">
         <legend>Condition (État du timbre)</legend>
-        <div class="checkbox-group">
-          <label for="filtre-neuf">Neuf</label>
-          <input type="checkbox" id="filtre-neuf">
-        </div>
-        <div class="checkbox-group">
-          <label for="filtre-oblit">Oblit (timbre utilisé)</label>
-          <input type="checkbox" id="filtre-oblit">
-        </div>
-        <div class="checkbox-group">
-          <label for="filtre-gomme">Avec ou sans gomme</label>
-          <input type="checkbox" id="filtre-gomme">
-        </div>
+        {% for cond in conditions %}
+          <label class="checkline">
+            <input type="checkbox" name="condition_id[]" value="{{ cond.id }}"
+                   {{ cond.id in filters.condition_id ? 'checked' : '' }} data-autosubmit>
+            {{ cond.name }}
+          </label>
+        {% endfor %}
       </fieldset>
 
-      <!-- Popularité -->
-      <fieldset class="filtre-section">
-        <legend>Popularité</legend>
-        <div class="checkbox-group">
-          <label for="filtre-populaires">Les plus populaires</label>
-          <input type="checkbox" id="filtre-populaires">
-        </div>
-        <div class="checkbox-group">
-          <label for="filtre-nouveautes">Nouveautés</label>
-          <input type="checkbox" id="filtre-nouveautes">
-        </div>
-        <div class="checkbox-group">
-          <label for="filtre-prix-croissant">Prix croissant / décroissant</label>
-          <input type="checkbox" id="filtre-prix-croissant">
-        </div>
-      </fieldset>
+      <!-- Tri -->
+      <div class="filtre-group">
+        <label for="sort">Trier par</label>
+        <select id="sort" name="sort" data-autosubmit>
+          <option value="newest"     {{ filters.sort == 'newest'     ? 'selected' : '' }}>Nouveautés</option>
+          <option value="price_asc"  {{ filters.sort == 'price_asc'  ? 'selected' : '' }}>Prix ↑</option>
+          <option value="price_desc" {{ filters.sort == 'price_desc' ? 'selected' : '' }}>Prix ↓</option>
+          <option value="popular"    {{ filters.sort == 'popular'    ? 'selected' : '' }}>Popularité</option>
+        </select>
+      </div>
 
-      <!-- Disponibilité -->
-      <fieldset class="filtre-section">
-        <legend>Disponibilité</legend>
-        <div class="checkbox-group">
-          <label for="filtre-stock">Inclure les articles non en stock</label>
-          <input type="checkbox" id="filtre-stock">
-        </div>
-      </fieldset>
+      <div class="filtre-actions" style="display:flex; gap:.5rem;">
+        <button type="submit" class="btn-appliquer">Appliquer</button>
+        <a href="{{ base }}/catalogue" class="btn-reset">Réinitialiser</a>
+      </div>
+    </form>
 
-      <!-- Tranche d'âge -->
-      <fieldset class="filtre-section">
-        <legend>Tranche d'âge</legend>
-        <div class="checkbox-group">
-          <label for="filtre-age">14 ans et plus</label>
-          <input type="checkbox" id="filtre-age">
-        </div>
-      </fieldset>
-    </div>
-
+    {# ===================== Contenu ===================== #}
     <div class="timbres-container">
-      <!-- Barre de recherche -->
+      <!-- Barre de recherche (statique) -->
       <div class="timbres-search-bar">
         <div class="search-box">
           <label for="recherche-scott" class="visually-hidden">Rechercher par numéro Scott :</label>
@@ -152,8 +124,6 @@
 
       <div class="banner-devenir-membre">
         <button class="btn-devenir-membre">Devenir Membre</button>
-
-        {# bouton "Ajouter un timbre" si l'utilisateur est connecté #}
         {% if loggedin|default(false) %}
           <a href="{{ base }}/stamps/create" class="btn-devenir-membre">+ Ajouter un timbre</a>
         {% endif %}
@@ -180,10 +150,8 @@
         <h2>Collection de Timbres</h2>
 
         <div class="catalogue-grid">
-          {# Boucle dynamique sur les timbres venant de la BD #}
           {% for s in stamps %}
             <article class="carte">
-              {# Lien overlay vers la fiche (query-string) #}
               <a href="{{ base }}/fiche-produit?id={{ s.id }}" class="lien-produit">Voir plus de détails</a>
 
               <figure class="carte-image">
@@ -224,3 +192,13 @@
 </main>
 
 {% include 'layouts/footer.twig' %}
+
+{# petite aide visuelle pour que les labels ne fassent pas bouger le panneau #}
+<style>
+  .valfix{display:inline-block;min-width:12ch;text-align:right}
+  .filtre-range{display:flex;align-items:center;gap:.5rem}
+  .checkline{display:flex;gap:.5rem;align-items:center;margin:.25rem 0}
+</style>
+
+{# JS externe pour l’auto-apply/AJAX des filtres #}
+<script src="{{ assets_base }}/assets/js/filtre-avance.js?v=1"></script>

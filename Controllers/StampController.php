@@ -384,34 +384,95 @@ class StampController
     {
         $db = \App\Models\Database::getConnection();
 
-        // Liste des timbres avec: pays, image principale, prix actuel, nb mises
+        // ---- paramètres GET ----
+        $yearMin   = isset($_GET['year_min'])  ? (int)$_GET['year_min']  : null;
+        $yearMax   = isset($_GET['year_max'])  ? (int)$_GET['year_max']  : null;
+        $countryId = (isset($_GET['country_id']) && ctype_digit((string)$_GET['country_id']))
+            ? (int)$_GET['country_id'] : null;
+        $priceMin  = isset($_GET['price_min']) ? (float)$_GET['price_min'] : null;
+        $priceMax  = isset($_GET['price_max']) ? (float)$_GET['price_max'] : null;
+        $sort      = $_GET['sort'] ?? 'newest'; // newest | price_asc | price_desc | popular
+
+        // Multi-sélection: condition_id[]
+        $condIds = [];
+        if (!empty($_GET['condition_id'])) {
+            foreach ((array)$_GET['condition_id'] as $v) {
+                if (ctype_digit((string)$v)) $condIds[] = (int)$v;
+            }
+            $condIds = array_values(array_unique($condIds));
+        }
+
+        // ---- WHERE dynamique ----
+        $where  = [];
+        $params = [];
+
+        if ($yearMin !== null) {
+            $where[] = "YEAR(s.creationDate) >= :ymin";
+            $params[':ymin'] = $yearMin;
+        }
+        if ($yearMax !== null) {
+            $where[] = "YEAR(s.creationDate) <= :ymax";
+            $params[':ymax'] = $yearMax;
+        }
+        if ($countryId) {
+            $where[] = "s.country_id = :cid";
+            $params[':cid']  = $countryId;
+        }
+        if ($priceMin !== null) {
+            $where[] = "COALESCE(auc.curr_price, 0) >= :pmin";
+            $params[':pmin'] = $priceMin;
+        }
+        if ($priceMax !== null) {
+            $where[] = "COALESCE(auc.curr_price, 0) <= :pmax";
+            $params[':pmax'] = $priceMax;
+        }
+        if ($condIds) {
+            $marks = [];
+            foreach ($condIds as $i => $cid) {
+                $k = ":cond{$i}";
+                $marks[] = $k;
+                $params[$k] = $cid;
+            }
+            $where[] = "s.condition_id IN (" . implode(',', $marks) . ")";
+        }
+
+        $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
+
+        // ---- ORDER BY ----
+        switch ($sort) {
+            case 'price_asc':
+                $orderBy = "ORDER BY COALESCE(auc.curr_price,0) ASC";
+                break;
+            case 'price_desc':
+                $orderBy = "ORDER BY COALESCE(auc.curr_price,0) DESC";
+                break;
+            case 'popular':
+                $orderBy = "ORDER BY COALESCE(auc.bids_count,0) DESC";
+                break;
+            case 'newest':
+            default:
+                $orderBy = "ORDER BY s.id DESC";
+        }
+
+        // ---- requête principale ----
         $sql = "
       SELECT
         s.id,
         s.name,
         s.creationDate,
         co.name  AS country_name,
-
-        -- image principale si marquée 'Main', sinon n'importe laquelle
         COALESCE(img_main.image_url, img_any.image_url) AS main_image,
-
-        -- stats d'enchère
         COALESCE(auc.curr_price, 0.00)  AS current_price,
         COALESCE(auc.bids_count, 0)     AS bids_count
       FROM Stamp s
       LEFT JOIN Country co ON co.id = s.country_id
-
-      -- image principale
       LEFT JOIN Image img_main
              ON img_main.Stamp_id = s.id AND img_main.image_type = 'Main'
-      -- image fallback si pas de 'Main'
       LEFT JOIN (
           SELECT i2.Stamp_id, MIN(i2.image_url) AS image_url
           FROM Image i2
           GROUP BY i2.Stamp_id
       ) AS img_any ON img_any.Stamp_id = s.id
-
-      -- stats enchères : prix courant = MAX(b.amount), nb mises = COUNT(b.id)
       LEFT JOIN (
           SELECT a.stamp_id,
                  MAX(b.amount) AS curr_price,
@@ -420,16 +481,40 @@ class StampController
           LEFT JOIN bid b ON b.auction_id = a.id
           GROUP BY a.stamp_id
       ) AS auc ON auc.stamp_id = s.id
-
-      ORDER BY s.id DESC
+      $whereSql
+      $orderBy
     ";
 
-        $rows = $db->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        // listes pour les selects/checkbox
+        $countries  = $db->query("SELECT id, name FROM Country ORDER BY name")->fetchAll(\PDO::FETCH_ASSOC);
+        $conditions = $db->query("SELECT id, name FROM Stamp_Condition ORDER BY name")->fetchAll(\PDO::FETCH_ASSOC);
+
+        // valeurs pour l’UI (défaut année=1750)
+        $filters = [
+            'year_min'     => $yearMin   ?? 1750,
+            'year_max'     => $yearMax   ?? 2024,
+            'country_id'   => $countryId ?? '',
+            'price_min'    => $priceMin  ?? 0,
+            'price_max'    => $priceMax  ?? 7500,
+            'sort'         => $sort,
+            'condition_id' => $condIds,
+        ];
+
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $loggedin = !empty($_SESSION['user_id']);
 
         return \App\Providers\View::render('pages/catalogueProduit', [
-            'stamps' => $rows,
-            'base'   => defined('BASE')  ? BASE  : '',
-            'asset'  => defined('ASSET') ? ASSET : '',
+            'stamps'     => $rows,
+            'countries'  => $countries,
+            'conditions' => $conditions,
+            'filters'    => $filters,
+            'loggedin'   => $loggedin,
+            'base'       => defined('BASE')  ? BASE  : '',
+            'asset'      => defined('ASSET') ? ASSET : '',
         ]);
     }
 
