@@ -45,15 +45,15 @@ Route::get('fiche-produit',  'StampController@showPublic');  // détail
 
 Route::get('fichierProduit', 'StampController@showPublic');
 
+// placer une mise
+Route::post('auctions/bid',  'AuctionController@place');
 
+// Enchères
+Route::post('auctions/create', 'AuctionController@createForStamp');
 
-
-// Enchères 
 Route::get('auctions',                 'AuctionController@index');   // (optionnel) liste
 Route::get('auctions/create',          'AuctionController@create');  // (optionnel) form vendeur
 Route::post('auctions/store',          'AuctionController@store');   // (optionnel) POST créer
 
-// Détail + mise (paramètre {id})
-Route::get('auctions/{id:\d+}',        'AuctionController@show');    // page produit + historique
-Route::post('auctions/{id:\d+}/bid',   'AuctionController@place');   // POST miser
+
 

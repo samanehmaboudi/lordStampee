@@ -437,48 +437,108 @@ class StampController
     /* ==================== CatologueProduit ==================== */
     public function showPublic($id = null)
     {
+        // 1) Résoudre l'ID depuis l'URL si besoin
         if ($id === null && isset($_GET['id'])) {
-            $id = (int)$_GET['id'];
+            $id = (int) $_GET['id'];
         }
-        $id = (int)$id;
+        $id = (int) $id;
 
-        $db = Database::getConnection();
+        $db = \App\Models\Database::getConnection();
 
+        // 2) Timbre + méta (noms pour la vue)
         $stmt = $db->prepare("
-            SELECT s.*,
-                   c.name  AS country,
-                   cat.name AS category,
-                   sc.name  AS cond,
-                   col.name AS color
-            FROM Stamp s
-            LEFT JOIN Country         c   ON c.id  = s.country_id
-            LEFT JOIN Category        cat ON cat.id= s.category_id
-            LEFT JOIN Stamp_Condition sc  ON sc.id = s.condition_id
-            LEFT JOIN Color           col ON col.id= s.color_id
-            WHERE s.id = ?
-        ");
+        SELECT s.*,
+               c.name   AS country_name,
+               cat.name AS category_name,
+               sc.name  AS condition_name,
+               col.name AS color_name
+        FROM Stamp s
+        LEFT JOIN Country         c   ON c.id   = s.country_id
+        LEFT JOIN Category        cat ON cat.id = s.category_id
+        LEFT JOIN Stamp_Condition sc  ON sc.id  = s.condition_id
+        LEFT JOIN Color           col ON col.id = s.color_id
+        WHERE s.id = ?
+    ");
         $stmt->execute([$id]);
         $stamp = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$stamp) {
             if (session_status() === PHP_SESSION_NONE) session_start();
             $_SESSION['error'] = "Timbre introuvable.";
-            return View::redirect('catalogue');
+            return \App\Providers\View::redirect('catalogue');
         }
 
+        // 3) Images du timbre (Main d'abord)
         $imgs = $db->prepare("
-            SELECT * FROM Image
-            WHERE Stamp_id = ?
-            ORDER BY image_type = 'Main' DESC, id ASC
-        ");
+        SELECT *
+        FROM Image
+        WHERE Stamp_id = ?
+        ORDER BY image_type = 'Main' DESC, id ASC
+    ");
         $imgs->execute([$id]);
         $images = $imgs->fetchAll(\PDO::FETCH_ASSOC);
 
-        return View::render('pages/fichierProduit', [
-            'stamp'  => $stamp,
-            'images' => $images,
-            'asset'  => $GLOBALS['asset'] ?? '',
-            'base'   => $GLOBALS['base']  ?? '',
+        // 4) Enchère "ouverte" (fenêtre de dates) la plus récente pour ce timbre
+        $stAuc = $db->prepare("
+        SELECT *
+        FROM auction
+        WHERE stamp_id = ?
+          AND (start_at IS NULL OR start_at <= NOW())
+          AND (end_at   IS NULL OR end_at   >= NOW())
+        ORDER BY id DESC
+        LIMIT 1
+    ");
+        $stAuc->execute([$id]);
+        $a = $stAuc->fetch(\PDO::FETCH_ASSOC) ?: null;
+
+        // 5) Prix courant + historique des mises (JOIN sur bidder_id)
+        $stats = ['current_price' => 0.0, 'bids_count' => 0];
+        $bids  = [];
+
+        if ($a) {
+            // top bid + count
+            $stTop = $db->prepare("SELECT COALESCE(MAX(amount),0) AS top_bid,
+                                      COUNT(*) AS bids_count
+                               FROM bid
+                               WHERE auction_id = ?");
+            $stTop->execute([(int)$a['id']]);
+            $agg = $stTop->fetch(\PDO::FETCH_ASSOC) ?: ['top_bid' => 0, 'bids_count' => 0];
+
+            $current = max((float)$agg['top_bid'], (float)$a['starting_price']);
+            $stats   = ['current_price' => $current, 'bids_count' => (int)$agg['bids_count']];
+
+            // historique (username via user.id = bid.bidder_id)
+            $stHist = $db->prepare("
+            SELECT b.amount, b.created_at, u.name AS bidder_name
+            FROM bid b
+            LEFT JOIN user u ON u.id = b.bidder_id
+            WHERE b.auction_id = ?
+            ORDER BY b.created_at DESC
+            LIMIT 50
+        ");
+            $stHist->execute([(int)$a['id']]);
+            $bids = $stHist->fetchAll(\PDO::FETCH_ASSOC);
+        }
+
+        // 6) Flash + info connexion
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $error    = $_SESSION['error']   ?? '';
+        $success  = $_SESSION['success'] ?? '';
+        $loggedin = !empty($_SESSION['user_id']);
+        unset($_SESSION['error'], $_SESSION['success']);
+
+        // 7) Rendu
+        return \App\Providers\View::render('pages/fichierProduit', [
+            'stamp'    => $stamp,
+            'images'   => $images,
+            'a'        => $a,                 // enchère (null => pas de formulaire de mise)
+            'stats'    => $stats,             // current_price, bids_count
+            'bids'     => $bids,              // historique
+            'error'    => $error,
+            'success'  => $success,
+            'loggedin' => $loggedin,
+            'base'     => defined('BASE')  ? BASE  : '',
+            'asset'    => defined('ASSET') ? ASSET : '',
         ]);
     }
 }
