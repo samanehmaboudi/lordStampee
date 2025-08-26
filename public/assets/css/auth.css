@@ -1,7 +1,8 @@
+/* =======================
+   AUTH.CSS (scopé .page-auth)
+   ======================= */
 
-
-/* 1) Variables avec valeurs de repli
-   (peuvent être écrasées par variables.css si chargé avant) */
+/* 1) Variables avec valeurs de repli */
 :root{
   --primary: #455fe4;
   --primary-contrast: #ffffff;
@@ -28,6 +29,7 @@ html, body {
   height: 100%;
 }
 
+/* 2.b) Contexte de page d'auth */
 body.page-auth {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
@@ -36,15 +38,30 @@ body.page-auth {
   line-height: 1.5;
 }
 
-/* Liens */
-a {
-  color: #ffffff;
-  text-decoration: none;
-  padding: 10px;
-  background: #b0975c;
+/* 2.c) Liens — UNIQUEMENT sur les pages d'auth */
+.page-auth a {
+  color: var(--primary, #455fe4);
+  text-decoration: underline;
+  background: transparent;
+  padding: 0;
 }
-a:hover,
-a:focus-visible { text-decoration: underline; }
+.page-auth a:hover,
+.page-auth a:focus-visible {
+  text-decoration: underline;
+}
+
+/* (Optionnel) style bouton/lien doré utilisable sur auth seulement */
+.page-auth .link-gold,
+.page-auth .btn-gold {
+  display: inline-block;
+  background: #b0975c;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.page-auth .link-gold:hover,
+.page-auth .btn-gold:hover { background: #a28451; }
 
 /* 3) Barre de nav minimale (facultatif) */
 .nav-auth {
@@ -80,8 +97,6 @@ a:focus-visible { text-decoration: underline; }
   padding: 24px;
   box-shadow: var(--shadow, 0 18px 40px rgba(0,0,0,.12));
 }
-
-
 
 .center-page > .auth-wrap {
   width: auto;
@@ -217,7 +232,7 @@ a:focus-visible { text-decoration: underline; }
   color: var(--muted, #6b7280);
 }
 
-
+/* 9) Tableaux */
 .table,
 .data-table {
   width: 100%;
@@ -273,7 +288,7 @@ a:focus-visible { text-decoration: underline; }
 }
 
 /* 10) Accessibilité focus générale */
-a:focus-visible,
+.page-auth a:focus-visible,
 .button:focus-visible,
 .input:focus-visible,
 .form-input:focus-visible {
@@ -285,3 +300,71 @@ a:focus-visible,
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+
+/* ===================== OVERRIDES AUTH POUR MATCHER LE SITE ===================== */
+
+/* 1) Fond de page (bleu nuit + léger dégradé) uniquement sur les pages d’auth */
+body.page-auth {
+  --auth-nav-bg: #1b2136;       /* barre nav */
+  --auth-gold:   #b0975c;       /* or du site */
+  --auth-gold-2: #c8b27a;       /* or survol */
+  --auth-text:   #ffffff;
+
+  background:
+    radial-gradient(1200px 500px at 70% -10%, rgba(255,255,255,0.06), transparent 60%),
+    linear-gradient(180deg, #111731 0%, #0d1329 100%);
+  min-height: 100dvh;
+}
+
+/* 2) Mini-menu du haut (nav-auth) = barre sombre + boutons or, centré */
+.page-auth .nav-auth{
+  background: var(--auth-nav-bg);
+  border: 0;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+}
+.page-auth .nav-auth ul{
+  margin: 0;
+  padding: 12px 6vw;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+/* style des liens du mini-menu sans toucher le reste du site */
+.page-auth .nav-auth a{
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--auth-gold);
+  color: var(--auth-text);
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 2px 0 rgba(0,0,0,.22);
+  transition: transform .08s ease, background-color .15s ease, box-shadow .15s ease;
+}
+.page-auth .nav-auth a:hover{
+  background: var(--auth-gold-2);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.28);
+}
+
+/* 3) Positionnement de la carte d’auth pour respirer sous la barre */
+.page-auth .auth-wrap{ 
+  margin-top: 56px;     /* espace sous le mini-menu */
+  margin-bottom: 56px;
+}
+
+/* 4) Option: masquer le footer global sur les pages d’auth (décommente si tu veux) */
+/* .page-auth footer { display: none; } */
+.page-auth .auth-card a {
+  background: transparent;
+  padding: 0;
+  color: var(--primary);
+  text-decoration: none;
+}
+.page-auth .auth-card a:hover {
+  background: transparent;
+  text-decoration: underline;
+}
+
