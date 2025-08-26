@@ -1,6 +1,7 @@
 <?php
 
 use App\Routes\Route;
+use App\Controllers\AuctionController;
 
 // Auth
 Route::get('login',    'AuthController@login');
@@ -41,3 +42,18 @@ Route::post('stamps/delete', 'StampController@destroy');
 // Catalogue public
 Route::get('catalogue',      'StampController@indexPublic');  // liste
 Route::get('fiche-produit',  'StampController@showPublic');  // détail
+
+Route::get('fichierProduit', 'StampController@showPublic');
+
+
+
+
+// Enchères 
+Route::get('auctions',                 'AuctionController@index');   // (optionnel) liste
+Route::get('auctions/create',          'AuctionController@create');  // (optionnel) form vendeur
+Route::post('auctions/store',          'AuctionController@store');   // (optionnel) POST créer
+
+// Détail + mise (paramètre {id})
+Route::get('auctions/{id:\d+}',        'AuctionController@show');    // page produit + historique
+Route::post('auctions/{id:\d+}/bid',   'AuctionController@place');   // POST miser
+

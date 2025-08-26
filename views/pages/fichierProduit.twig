@@ -1,198 +1,290 @@
-{% include 'layouts/header.twig' %}
+
+
+{# chemins sûrs #}
+{% set base_default = '/Stampee-new/Projet-web1-sprint1' %}
+{% set base        = base  | default(base_default) %}
+{% set asset       = asset | default(base ~ '/public') %}
+{% set assets_base = assets_base | default(asset) %}
+
+{# === HEAD (via header.twig) === #}
+{% include 'layouts/header.twig' with {
+  title: stamp.name is defined ? stamp.name : 'Fiche produit',
+  page_css: [
+    assets_base ~ '/assets/css/grid.css?v=1',
+    assets_base ~ '/assets/css/galerie-image.css?v=1',
+    assets_base ~ '/assets/css/details-produit.css?v=1',
+    assets_base ~ '/assets/css/description.css?v=1',
+    assets_base ~ '/assets/css/mise.css?v=1',
+    assets_base ~ '/assets/css/historique-offres.css?v=1',
+    assets_base ~ '/assets/css/carte.css?v=1'
+  ],
+  page_js: [
+    assets_base ~ '/assets/js/gallery-thumbs.js?v=1',  # clic miniature -> remplace la grande image
+    assets_base ~ '/assets/js/zoom-image.js?v=1'       # zoom grande image
+  ]
+} %}
+
+{# === Prépare l’image principale (uploads) === #}
+{% set main = null %}
+{% if images is defined and images|length > 0 %}
+  {% for img in images %}
+    {% if img.image_type == 'Main' and main is null %}
+      {% set main = img %}
+    {% endif %}
+  {% endfor %}
+  {% if main is null %}{% set main = images[0] %}{% endif %}
+  {% set main_src = main.image_url starts with('/') 
+      ? (base ~ main.image_url) 
+      : (assets_base ~ '/assets/images/' ~ main.image_url) %}
+{% else %}
+  {% set main_src = assets_base ~ '/assets/images/placeholder.png' %}
+{% endif %}
 
 <main>
-    <div class="contenu-principal">
-      <!-- Titre du produit -->
-      <header class="titre-produit">
-        <h1>GOLD COAST 107 NON DÉTACHÉ ** EXCELLENT ÉTAT - PNH</h1>
-      </header>
+  <div class="contenu-principal">
 
-      <!-- Conteneur principal du produit-->
-      <div class="container">
-        <!-- Galerie d'images et enchères -->
-        <aside class="image-container">
-          <div class="galerie-images">
-            <i class="fa-solid fa-heart icone-coeur"></i>
+    <!-- Titre -->
+    <header class="titre-produit">
+      <h1>{{ stamp.name|default('Timbre') }}</h1>
+    </header>
+
+    {# Flash #}
+    {% if error %}<p class="alert alert-error">{{ error }}</p>{% endif %}
+    {% if success %}<p class="alert alert-success">{{ success }}</p>{% endif %}
+
+    <!-- Conteneur principal -->
+    <div class="container">
+
+      <!-- Colonne gauche : galerie + description + mise -->
+      <aside class="image-container">
+        <div class="galerie-images">
+          <i class="fa-solid fa-heart icone-coeur" aria-hidden="true"></i>
+
+          {# Miniatures #}
+          {% if images is defined and images|length > 0 %}
             <div class="miniatures">
-              <img src="{{ asset }}/assets/images/photo-GB-1840.jpg" alt="Miniature 1">
-              <img src="{{ asset }}/assets/images/photo-GB-1873.jpg" alt="Miniature 2">
-              <img src="{{ asset }}/assets/images/photo-GB-1875.jpg" alt="Miniature 3">
-              <img src="{{ asset }}/assets/images/photo-GB-1880.jpg" alt="Miniature 4">
-              <img src="{{ asset }}/assets/images/photo-GB-1852.jpg" alt="Miniature 5">
+              {% for img in images %}
+                {% set src = img.image_url starts with('/') 
+                    ? (base ~ img.image_url) 
+                    : (assets_base ~ '/assets/images/' ~ img.image_url) %}
+                <img src="{{ src }}" data-full="{{ src }}" alt="Miniature {{ loop.index }}">
+              {% endfor %}
             </div>
-            <figure class="image-principale">
-              <img src="{{ asset }}/assets/images/photo-GB-1852.jpg" alt="Timbre Gold Coast">
-              <figcaption>Timbre Gold Coast - État impeccable</figcaption>
-            </figure>
-          </div>
+          {% else %}
+            <div class="miniatures">
+              <img src="{{ assets_base }}/assets/images/photo-GB-1840.jpg" alt="Miniature 1">
+              <img src="{{ assets_base }}/assets/images/photo-GB-1873.jpg" alt="Miniature 2">
+              <img src="{{ assets_base }}/assets/images/photo-GB-1875.jpg" alt="Miniature 3">
+              <img src="{{ assets_base }}/assets/images/photo-GB-1880.jpg" alt="Miniature 4">
+              <img src="{{ assets_base }}/assets/images/photo-GB-1852.jpg" alt="Miniature 5">
+            </div>
+          {% endif %}
 
-          <!-- Description enrichie -->
-          <section class="description">
-            <h2>Description</h2>
-            <p class="description-encher">
-              Ce timbre <strong>Gold Coast 107</strong>, émis en <strong>1928</strong>, est un véritable bijou pour les
-              collectionneurs de philatélie. Son état <strong>Neuf (NH - Never Hinged)</strong> garantit qu’il n’a
-              jamais
-              été collé sur une enveloppe et qu’il conserve sa gomme d'origine intacte.<br><br>
-              Il s'agit d'une <strong>émission rare</strong>, connue pour sa finesse d’impression et sa grande qualité
-              de
-              conservation. Il représente un fragment de l’histoire coloniale britannique en Afrique de l’Ouest, une
-              époque où <strong>Gold Coast</strong> (aujourd’hui le Ghana) utilisait encore des timbres
-              impériaux.<br><br>
-              Avec un <strong>centrage parfait (VF - Very Fine)</strong>, ce timbre est apprécié par les experts pour
-              son
-              alignement précis et ses perforations nettes. Son <strong>design classique</strong> et son
-              <strong>impression de haute qualité</strong> en font un élément de collection essentiel pour les
-              passionnés
-              de philatélie.
+          {# Grande image #}
+          <figure class="image-principale">
+            <img id="main-photo" src="{{ main_src }}" alt="{{ stamp.name|e }}">
+            <figcaption>{{ stamp.name|e }}{% if stamp.creationDate %} — {{ stamp.creationDate|e }}{% endif %}</figcaption>
+          </figure>
+        </div>
+
+        {# Description #}
+        <section class="description">
+          <h2>Description</h2>
+          <p class="description-encher">
+            {{ stamp.description|default("Superbe timbre de collection en excellent état.") }}
+          </p>
+        </section>
+
+        {# ======= SECTION MISE ======= #}
+        {% set cur    = stats.current_price|default(0) %}
+        {% set incr   = a.min_increment|default(0.50) %}
+        {% set minBid = (cur + incr) %}
+        <form class="section-mise" action="{{ base }}/auctions/{{ a.id }}/bid" method="post" novalidate>
+          <label for="enchere" class="visually-hidden">Entrez votre enchère</label>
+
+          <input
+            id="enchere"
+            name="amount"
+            type="number"
+            placeholder="Votre enchère"
+            min="{{ minBid|number_format(2, '.', '') }}"
+            step="{{ incr|number_format(2, '.', '') }}"
+            value="{{ minBid|number_format(2, '.', '') }}"
+            required
+          >
+          <button class="btn-miser" type="submit">Placer une enchère</button>
+          <button class="bouton-annuler" type="reset">Annuler</button>
+          <p class="hint">Minimum requis : {{ minBid|number_format(2, '.', ' ') }} $</p>
+        </form>
+      </aside>
+
+      <!-- Colonne droite : détails produit -->
+      <article class="details-produit">
+        <h2>Détails du produit</h2>
+
+        <div class="cote-a-cote">
+          <section class="informations">
+            <h3>Caractéristiques du produit</h3>
+            <p><strong>Pays :</strong> {{ stamp.country_name|default('—') }}</p>
+            <p><strong>Catégorie :</strong> {{ stamp.category_name|default('—') }}</p>
+            <p><strong>État :</strong> {{ stamp.condition_name|default('—') }}</p>
+            <p><strong>Couleur :</strong> {{ stamp.color_name|default('—') }}</p>
+            <p><strong>Année d'émission :</strong> {{ stamp.creationDate|default('—') }}</p>
+
+            <button class="badge-miser" type="button"
+              onclick="document.getElementById('enchere').focus()">Miser maintenant</button>
+
+            <p class="prix">
+              Mise actuelle :
+              <strong>{{ cur|number_format(2, '.', ' ') }} $</strong>
             </p>
+
+            <!-- Historique des offres -->
+            <details class="historique-offres">
+              <summary>Historique des offres ({{ bids|default([])|length }})</summary>
+              {% if bids is defined and bids|length > 0 %}
+                <ul>
+                  {% for b in bids %}
+                    <li>
+                      <span class="auteur"><strong>{{ b.bidder_name|default('Utilisateur') }}</strong></span>
+                      <span class="montant">{{ b.amount|number_format(2, '.', ' ') }} $</span>
+                      <span class="date">{{ b.created_at|date('d/m H:i') }}</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p class="vide">Aucune mise pour le moment.</p>
+              {% endif %}
+            </details>
           </section>
 
-
-          <div class="section-mise">
-            <label for="enchere" class="visually-hidden">Entrez votre enchère :</label>
-            <input type="number" id="enchere" placeholder="Votre enchère">
-            <button>Placer une enchère</button>
-            <button class="bouton-annuler">Annuler</button>
+          <!-- Livraison / paiement -->
+          <section class="info-livraison">
+            <h3>Livraison et paiement</h3>
+            <p><strong>Livraison :</strong> Livraison gratuite à partir de 50,00 $</p>
+            <p><strong>Prix actuel :</strong> {{ cur|number_format(2, '.', ' ') }} $</p>
+            <p><strong>Transaction sécurisée</strong></p>
+            <p><strong>Moyens de paiement acceptés :</strong></p>
+            <div class="icones-paiement">
+              <i class="fab fa-cc-mastercard mastercard" aria-hidden="true"></i>
+              <i class="fab fa-cc-visa visa" aria-hidden="true"></i>
+              <i class="fab fa-cc-paypal paypal" aria-hidden="true"></i>
+            </div>
+          </section>
         </div>
-        
-      </aside>
-        
-        <!-- Détails du produit -->
-        <article class="details-produit">
-          <h2>Détails du produit</h2>
-          <div class="cote-a-cote">
-            <section class="informations">
-              <h3>Caractéristiques du produit</h3>
-              <p><strong>Pays :</strong> Gold Coast</p>
-              <p><strong>Numéro de catalogue :</strong> 107</p>
-              <p><strong>Type de timbre :</strong> Édition Générale</p>
-              <p><strong>État :</strong> Neuf (NH)</p>
-              <p><strong>Centrage :</strong> Très bon état (VF)</p>
-              <p><strong>Format :</strong> Timbre unique</p>
-              <p><strong>Année d'émission :</strong> 1928</p>
-              <button class="badge-miser">Miser Maintenant</button>
-              <p class="prix">Mise actuelle : <strong>$110.00</strong></p>
-              <!-- Historique des offres -->
-              <details class="historique-offres">
-                <summary>Voir l'historique des offres</summary>
-                <ul>
-                  <li><strong>Nicole</strong> 120.00$ - il y a 3 heure</li>
-                  <li><strong>Albert</strong> 130.00$ - il y a 1 heure</li>
-                </ul>
-              </details>
-            </section>
-            <!-- Informations de livraison et paiement -->
-            <section class="info-livraison">
-              <h3>Livraison et paiement</h3>
-              <p><strong>Livraison :</strong> Livraison gratuite à partir de 50,00$</p>
-              <p><strong>Prix actuel :</strong> 110.00$</p>
-              <p>Retrait GRATUIT en magasin le lundi 17 février.</p>
-              <p><strong>Transaction sécurisée</strong></p>
-              <p><strong>Moyens de paiement acceptés :</strong></p>
-              <div class="icones-paiement">
-                <i class="fab fa-cc-mastercard mastercard"></i>
-                <i class="fab fa-cc-visa visa"></i>
-                <i class="fab fa-cc-paypal paypal"></i>
-              </div>
-            </section>
-          </div>
-
-
-        </article>
-      </div> 
-
-      <!-- Autres produits -->
-      <div class="container">
-        <section class="produits-relies">
-          <h2>Autres produits liés</h2>
-          <div class="liste-produits">
-            <article class="carte-produit">
-              <div class="image-produit">
-                <img src="{{ asset }}/assets/images/photo-GB-1840.jpg" alt="Timbre Bangkok">
-              </div>
-              <div class="details-produit">
-                <h3>BANGKOK 12 USAGÉ</h3>
-                <p class="description-produit">Aucun défaut - Très bon état</p>
-                <p class="code-stock">Code stock :#155</p>
-                <p class="prix">$175.00</p>
-                <div class="actions-produit">
-                  <i class="fa-regular fa-heart"></i>
-                  <i class="fa-solid fa-arrow-right"></i>
-                </div>
-              </div>
-            </article>
-
-            <article class="carte-produit">
-              <div class="image-produit">
-                <img src="{{ asset }}/assets/images/photo-GB-1873.jpg" alt="Timbre Macao">
-                <span class="etiquette promo">En promotion</span>
-              </div>
-              <div class="details-produit">
-                <h3>MACAO 39 USAGÉ</h3>
-                <p class="description-produit">Aucun défaut - Très bon état</p>
-                <p class="code-stock">Code stock : #187</p>
-                <p class="prix"><s>$170.00</s> <strong>$155.00</strong></p>
-                <div class="actions-produit">
-                  <i class="fa-regular fa-heart"></i>
-                  <i class="fa-solid fa-arrow-right"></i>
-                </div>
-              </div>
-            </article>
-
-            <article class="carte-produit">
-              <div class="image-produit">
-                <img src="{{ asset }}/assets/images/photo-GB-1875.jpg" alt="Timbre Terre-Neuve">
-              </div>
-              <div class="details-produit">
-                <h3>Timbre de Terre-Neuve #8</h3>
-                <p class="description-produit rare">Rare - Édition limitée</p>
-                <p class="code-stock">Code stock : #111</p>
-                <p class="prix">$1.175.00</p>
-                <button class="bouton-offre">Faire une offre</button>
-                <div class="actions-produit">
-                  <i class="fa-regular fa-heart"></i>
-                  <i class="fa-solid fa-arrow-right"></i>
-                </div>
-              </div>
-            </article>
-
-            <article class="carte-produit">
-              <div class="image-produit">
-                <img src="{{ asset }}/assets/images/photo-GB-1880.jpg" alt="Timbre France">
-                <span class="etiquette edition">Édition spéciale</span>
-              </div>
-              <div class="details-produit">
-                <h3>Timbre de France 1923</h3>
-                <p class="description-produit">Collection unique</p>
-                <p class="prix">$195.00</p>
-                <div class="actions-produit">
-                  <i class="fa-regular fa-heart"></i>
-                  <i class="fa-solid fa-arrow-right"></i>
-                </div>
-              </div>
-            </article>
-
-            <article class="carte-produit">
-              <div class="image-produit">
-                <img src="{{ asset }}/assets/images/photo-GB-1873.jpg" alt="Timbre Italie">
-              </div>
-              <div class="details-produit">
-                <h3>Timbre d'Italie #5</h3>
-                <p class="description-produit">Etat neuf, impeccable</p>
-                <p class="code-stock">Code stock :#333</p>
-                <p class="prix">$120.00</p>
-                <button class="bouton-offre">Faire une offre</button>
-                <div class="actions-produit">
-                  <i class="fa-regular fa-heart"></i>
-                  <i class="fa-solid fa-arrow-right"></i>
-                </div>
-              </div>
-            </article>
-          </div>
-        </section>
-      </div>
+      </article>
     </div>
+
+    <!-- Autres produits (statiques pour l’instant) -->
+    <div class="container">
+      <section class="produits-relies">
+        <h2>Autres produits liés</h2>
+        <div class="liste-produits">
+          <article class="carte-produit">
+            <div class="image-produit">
+              <img src="{{ assets_base }}/assets/images/photo-GB-1840.jpg" alt="Timbre Bangkok">
+            </div>
+            <div class="details-produit">
+              <h3>BANGKOK 12 USAGÉ</h3>
+              <p class="description-produit">Aucun défaut - Très bon état</p>
+              <p class="code-stock">Code stock : #155</p>
+              <p class="prix">$175.00</p>
+              <div class="actions-produit">
+                <i class="fa-regular fa-heart"></i>
+                <i class="fa-solid fa-arrow-right"></i>
+              </div>
+            </div>
+          </article>
+
+          <article class="carte-produit">
+            <div class="image-produit">
+              <img src="{{ assets_base }}/assets/images/photo-GB-1873.jpg" alt="Timbre Macao">
+              <span class="etiquette promo">En promotion</span>
+            </div>
+            <div class="details-produit">
+              <h3>MACAO 39 USAGÉ</h3>
+              <p class="description-produit">Aucun défaut - Très bon état</p>
+              <p class="code-stock">Code stock : #187</p>
+              <p class="prix"><s>$170.00</s> <strong>$155.00</strong></p>
+              <div class="actions-produit">
+                <i class="fa-regular fa-heart"></i>
+                <i class="fa-solid fa-arrow-right"></i>
+              </div>
+            </div>
+          </article>
+
+          <article class="carte-produit">
+            <div class="image-produit">
+              <img src="{{ assets_base }}/assets/images/photo-GB-1875.jpg" alt="Timbre Terre-Neuve">
+            </div>
+            <div class="details-produit">
+              <h3>Timbre de Terre-Neuve #8</h3>
+              <p class="description-produit rare">Rare - Édition limitée</p>
+              <p class="code-stock">Code stock : #111</p>
+              <p class="prix">$1.175.00</p>
+              <button class="bouton-offre">Faire une offre</button>
+              <div class="actions-produit">
+                <i class="fa-regular fa-heart"></i>
+                <i class="fa-solid fa-arrow-right"></i>
+              </div>
+            </div>
+          </article>
+
+          <article class="carte-produit">
+            <div class="image-produit">
+              <img src="{{ assets_base }}/assets/images/photo-GB-1880.jpg" alt="Timbre France">
+              <span class="etiquette edition">Édition spéciale</span>
+            </div>
+            <div class="details-produit">
+              <h3>Timbre de France 1923</h3>
+              <p class="description-produit">Collection unique</p>
+              <p class="prix">$195.00</p>
+              <div class="actions-produit">
+                <i class="fa-regular fa-heart"></i>
+                <i class="fa-solid fa-arrow-right"></i>
+              </div>
+            </div>
+          </article>
+
+          <article class="carte-produit">
+            <div class="image-produit">
+              <img src="{{ assets_base }}/assets/images/photo-GB-1873.jpg" alt="Timbre Italie">
+            </div>
+            <div class="details-produit">
+              <h3>Timbre d'Italie #5</h3>
+              <p class="description-produit">État neuf, impeccable</p>
+              <p class="code-stock">Code stock : #333</p>
+              <p class="prix">$120.00</p>
+              <button class="bouton-offre">Faire une offre</button>
+              <div class="actions-produit">
+                <i class="fa-regular fa-heart"></i>
+                <i class="fa-solid fa-arrow-right"></i>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+  </div>
 </main>
 
 {% include 'layouts/footer.twig' %}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const main = document.querySelector('.image-principale img');
+  if (!main) return;
+  document.querySelectorAll('.miniatures img').forEach(img => {
+    img.addEventListener('click', () => {
+      const src = img.dataset.full || img.getAttribute('src');
+      if (src) {
+        main.src = src;
+        document.querySelectorAll('.miniatures img').forEach(i => i.classList.remove('is-active'));
+        img.classList.add('is-active');
+      }
+    });
+  });
+});
+</script>
+

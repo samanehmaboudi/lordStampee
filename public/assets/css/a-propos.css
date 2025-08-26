@@ -59,7 +59,7 @@
     border-color: black;
 }
 
-/* 🎯 Responsive - Tablettes et Mobiles */
+/*  Responsive - Tablettes et Mobiles */
 @media screen and (max-width: 1024px) {
     .a-propos {
         flex-direction: column; /* Passe en colonne */

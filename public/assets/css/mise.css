@@ -1,39 +1,92 @@
-/* ========== SECTION MISE ========== */
-.section-mise {
-    display: flex;
-    gap: var(--espace-moyen);
-    margin-top: var(--espace-grand);
+/* ===== SECTION MISE ===== */
+.section-mise{
+  display: grid;
+  grid-template-columns: 1fr auto auto; /* input | Miser | Annuler */
+  gap: var(--espace-moyen, 12px);
+  align-items: center;
+  margin-top: var(--espace-grand, 16px);
 }
 
-.section-mise input {
-    flex-grow: 1;
-    padding: var(--espace-moyen);
-    border: 1px solid var(--couleur-bordure);
-    border-radius: 5px;
-    font-size: var(--taille-texte);
+@media (max-width: 640px){
+  .section-mise{
+    grid-template-columns: 1fr; /* pile en mobile */
+  }
 }
 
-.section-mise button {
-    padding: var(--espace-moyen);
-    background-color: var(--couleur-principale);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s;
+/* Champ montant */
+.section-mise input[type="number"]{
+  padding: var(--espace-moyen, 10px);
+  border: 1px solid var(--couleur-bordure, #d1d5db);
+  border-radius: 8px;
+  font-size: var(--taille-texte, 1rem);
+  min-width: 0; /* évite débordement en grid */
 }
 
-.section-mise button:hover {
-    background-color: var(--couleur-or);
-    color: black;
+/* focus clair */
+.section-mise input[type="number"]:focus{
+  outline: none;
+  border-color: var(--couleur-principale, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.2);
 }
 
-.bouton-annuler {
-    background-color: #dc3545 !important;
-    color: var(--couleur-texte);
+/* (optionnel) enlever les flèches des number sur WebKit */
+.section-mise input[type="number"]::-webkit-outer-spin-button,
+.section-mise input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance: none; margin:0; }
+
+
+/* Boutons */
+.section-mise button{
+  padding: var(--espace-moyen, 10px) 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  height: 42px;            /* hauteur cohérente */
 }
 
-.bouton-annuler:hover {
-    background-color: #c82333 !important;
-    color: var(--couleur-principale);
+/* Miser (primaire) */
+.section-mise .btn-miser{
+  background: var(--couleur-principale, #10b981);
+  color: #fff;
+}
+.section-mise .btn-miser:hover{
+  background: #0ea371;
+}
+
+/* Annuler (secondaire/danger) */
+.section-mise .bouton-annuler{
+  background: #dc3545;
+  color: #fff;
+  border-color: #dc3545;
+}
+.section-mise .bouton-annuler:hover{
+  background: #c82333;
+}
+
+/* États */
+.section-mise button:disabled,
+.section-mise input:disabled{
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+/* aide + erreurs */
+.section-mise .hint{
+  grid-column: 1 / -1;      /* sur toute la ligne */
+  font-size: .9rem;
+  color: #6b7280;
+}
+.section-mise .error{
+  grid-column: 1 / -1;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+/* champ invalide (HTML5) */
+.section-mise input:invalid{
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239,68,68,.15);
 }

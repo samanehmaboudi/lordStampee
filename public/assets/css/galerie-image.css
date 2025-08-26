@@ -1,58 +1,103 @@
-/* ========== GALERIE D'IMAGES ========== */
-.image-container {
-    display: flex;
-    flex-direction: column;
-    width: 50%;
-    position: relative;
+/* ===== GALERIE D'IMAGES ===== */
 
+/* le parent .container gère déjà 2 colonnes; on évite width:50% ici */
+.image-container{
+  display: grid;
+  gap: var(--espace-grand, 16px);
+  min-width: 0; /* évite les débordements en grid */
+  position: relative;
 }
 
-.galerie-images {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px solid var(--couleur-bordure);
-    padding: var(--espace-grand);
-    background: #f8f8f8;
+.galerie-images{
+  display: grid;
+  gap: var(--espace-grand, 16px);
+  justify-items: center;
+  border: 1px solid var(--couleur-bordure, #e5e7eb);
+  padding: var(--espace-grand, 16px);
+  background: #f8f8f8;
+  border-radius: 12px;
 }
 
-.miniatures {
-    display: flex;
-    
-    gap: var(--espace-moyen);
-    margin-bottom: var(--espace-grand);
+/* --- miniatures --- */
+
+/* sur mobile: carrousel horizontal; sur desktop: grille fixe */
+.miniatures{
+  display: grid;
+  grid-auto-flow: column;
+  gap: var(--espace-moyen, 10px);
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+@media (min-width: 960px){
+  .miniatures{
+    grid-auto-flow: row;
+    grid-template-columns: repeat(5, 72px);
+    overflow: visible;
+  }
 }
 
+/* si tu gardes <img>, pense à tabindex="0". encore mieux: <button><img/></button> */
+.miniatures img{
+  width: 72px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border: 2px solid var(--couleur-bordure, #e5e7eb);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  background: #fff;
+  display: block;
+}
+.miniatures img:hover{ transform: translateY(-1px); border-color: var(--couleur-or, #d97706); }
+.miniatures img:focus{ outline: none; box-shadow: 0 0 0 3px rgba(217,119,6,.25); }
 
-
-.miniatures img {
-    width: 70px;
-    height: 70px;
-    object-fit: cover;
-    border: 2px solid var(--couleur-bordure);
-    border-radius: 5px;
-    cursor: pointer;
-    transition: transform 0.3s ease-in-out;
-
-
+/* miniature sélectionnée */
+.miniatures .is-active{
+  border-color: var(--couleur-or, #d97706);
+  box-shadow: 0 0 0 2px rgba(217,119,6,.35) inset;
 }
 
-.miniatures img:hover {
-    border-color: var(--couleur-or);
+/* --- image principale --- */
+.image-principale{
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: var(--espace-moyen, 10px);
 }
 
-.image-principale img {
-    width: 100%;
-    max-width: 450px;
-    border-radius: 5px;
-    border: 3px solid var(--couleur-bordure);
-
+.image-principale img{
+  width: 100%;
+  max-width: 520px;
+  max-height: 440px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 10px;
+  border: 3px solid var(--couleur-bordure, #e5e7eb);
 }
 
-.image-principale figcaption {
-    text-align: center;
-    font-size: var(--taille-texte);
-    color: var(--couleur-gris);
-    margin-top: var(--espace-moyen);
-    
+/* légende */
+.image-principale figcaption{
+  text-align: center;
+  font-size: var(--taille-texte, .95rem);
+  color: var(--couleur-gris, #6b7280);
 }
+
+/* icône cœur (favori) si présent */
+.icone-coeur{
+  position: absolute;
+  top: 10px; right: 12px;
+  font-size: 20px;
+  color: #e11d48;
+}
+
+.miniatures img { outline: none; }
+.miniatures img.is-active {
+  border-color: var(--couleur-or, #eab308);
+  box-shadow: 0 0 0 2px rgba(234, 179, 8, .35);
+}
+
+.image-principale { overflow: hidden; }
+.image-principale img { display:block; max-width:100%; height:auto; }
+.image-principale.is-zoomed img { cursor: grab; }
+

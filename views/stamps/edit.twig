@@ -1,10 +1,11 @@
-{# chemin des assets pour cette page #}
+{# chemin des assets pour cette page #} 
 {% set _assets = (asset is defined and asset) ? asset : (base ~ '/public') %}
 
-{# header + CSS spécifique à la page #}
+{# header + CSS/JS spécifiques à la page #}
 {% include 'layouts/header.twig' with {
   'title': 'Modifier un timbre',
-  'page_css': [_assets ~ '/assets/css/stamps.css?v=1']
+  'page_css': [_assets ~ '/assets/css/stamps.css?v=2'],
+  'page_js':  [_assets ~ '/assets/js/main-photo.js?v=3']
 } %}
 
 <main class="container stamp-edit">
@@ -67,42 +68,76 @@
       </select>
     </div>
 
-    {# ----- IMAGES EXISTANTES : choisir la principale (optionnel) ----- #}
-    {% if images is defined and images|length > 0 %}
-      <fieldset class="fieldset">
-        <legend>Images existantes</legend>
-        <div class="gallery">
+    {# ----- IMAGES EXISTANTES : aperçu + suppression ----- #}
+    {% set has_images = images is defined and images|length > 0 %}
+    <fieldset class="fieldset">
+      <legend>Images existantes</legend>
+
+      {% if has_images %}
+        <div class="image-previews">
           {% for img in images %}
-            <label class="gallery-item" style="display:inline-block;">
-              <input type="radio"
-                     name="make_main_id"
-                     value="{{ img.id }}"
-                     {% if img.image_type == 'Main' %}checked{% endif %}
-                     style="display:block; margin-bottom:6px;">
+            {# src robuste selon le contenu de image_url #}
+            {% set img_src = img.image_url starts with('/') 
+                ? (_assets ~ img.image_url) 
+                : (_assets ~ '/assets/images/' ~ img.image_url) %}
+            <label class="img-option {{ img.image_type == 'Main' ? 'is-primary' }}">
               <img class="gallery-img"
-                   src="{{ _assets }}/assets/images/{{ img.image_url }}"
-                   alt="{{ stamp.name|e }}">
-              <div class="gallery-caption">
-                {{ img.image_type }} • #{{ img.id }}
-              </div>
+                   src="{{ img_src }}"
+                   alt="{{ stamp.name|e }}"
+                   loading="lazy" decoding="async">
+              <span class="filename">{{ img.image_type }} • #{{ img.id }}</span>
+              <label style="font-size:12px; display:block; margin-top:6px;">
+                <input type="checkbox" name="delete_ids[]" value="{{ img.id }}">
+                Supprimer cette image
+              </label>
             </label>
           {% endfor %}
         </div>
-        <p class="note muted">Sélectionne une image pour la définir comme <strong>principale</strong>, ou laisse telle quelle.</p>
-      </fieldset>
-    {% endif %}
+      {% else %}
+        <p class="note">Aucune image pour l’instant.</p>
+      {% endif %}
+    </fieldset>
 
-    {# ----- AJOUTER DE NOUVELLES IMAGES (optionnel) ----- #}
+    {# ----- IMAGE PRINCIPALE : garder / existante / nouvelle ----- #}
     <fieldset class="fieldset">
-      <legend>Ajouter de nouvelles images (optionnel)</legend>
+      <legend>Image principale</legend>
+
+      <label style="display:block; margin-bottom:6px;">
+        <input type="radio" name="main_choice" value="keep" {{ has_images ? 'checked' : 'disabled' }}>
+        Garder l’image principale actuelle
+      </label>
+
+      {% if has_images %}
+        <label style="display:block; margin:10px 0 6px;">
+          <input type="radio" name="main_choice" value="existing">
+          Choisir parmi les images existantes
+        </label>
+        <div id="existing-picker" class="image-previews hidden">
+          {% for img in images %}
+            {% set img_src = img.image_url starts with('/') 
+                ? (_assets ~ img.image_url) 
+                : (_assets ~ '/assets/images/' ~ img.image_url) %}
+            <label class="img-option {{ img.image_type == 'Main' ? 'is-primary' }}">
+              <input type="radio" name="primary_existing_id" value="{{ img.id }}"
+                     {{ img.image_type == 'Main' ? 'checked' }}
+                     style="position:absolute; top:8px; left:8px;">
+              <img src="{{ img_src }}" alt="{{ stamp.name|e }}" loading="lazy" decoding="async">
+              <span class="filename">{{ img.image_type }} • #{{ img.id }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <label style="display:block; margin:10px 0 6px;">
+        <input type="radio" name="main_choice" value="new" {{ has_images ? '' : 'checked' }}>
+        Choisir parmi de <strong>nouvelles</strong> images
+      </label>
       <div class="form-group">
-        <input type="file" name="images[]" accept="image/*" multiple>
-        <p class="note">JPG/PNG/WebP — min 300×300 px, max 6 Mo — jusqu’à 10 fichiers.</p>
+        <input id="images" type="file" name="images[]" multiple>
+        <p class="note">Sélectionnez plusieurs fichiers puis choisissez la principale ci-dessous.</p>
       </div>
-      <div class="form-group">
-        <label for="primary_index">Index de l'image principale (parmi les nouvelles)</label>
-        <input id="primary_index" type="number" name="primary_index" min="-1" value="-1">
-        <small class="muted">-1 = ne pas changer la principale via les nouvelles images.</small>
+      <div id="image-previews" class="image-previews {{ has_images ? 'hidden' : '' }}">
+        <p class="note">Les aperçus apparaîtront ici.</p>
       </div>
     </fieldset>
 
@@ -114,3 +149,38 @@
 </main>
 
 {% include 'layouts/footer.twig' %}
+
+{# === petit JS d’appoint pour afficher/masquer les bons blocs & gérer "required" === #}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const existingPicker = document.getElementById('existing-picker');
+  const newPicker      = document.getElementById('image-previews');
+  const choiceInputs   = document.querySelectorAll('input[name="main_choice"]');
+
+  function sync() {
+    const val = document.querySelector('input[name="main_choice"]:checked')?.value;
+
+    if (existingPicker) existingPicker.classList.toggle('hidden', val !== 'existing');
+    if (newPicker)      newPicker.classList.toggle('hidden',      val !== 'new');
+
+    document.querySelectorAll('input[name="primary_existing_id"]')
+      .forEach(r => r.required = (val === 'existing'));
+
+    document.querySelectorAll('input[name="primary_index"]')
+      .forEach(r => r.required = (val === 'new'));
+  }
+
+  choiceInputs.forEach(r => r.addEventListener('change', sync));
+  sync();
+});
+</script>
+
+{# au cas où ta feuille ne l'aurait pas #}
+<style>
+  .hidden { display: none; }
+  .image-previews { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; align-items:start; }
+  .img-option { position:relative; display:grid; grid-template-rows:auto 1fr auto; gap:6px; padding:10px; border:1px solid #ddd; border-radius:10px; background:#fff; }
+  .img-option img { width:100%; height:120px; object-fit:cover; border-radius:6px; display:block; }
+  .img-option .filename { font-size:12px; color:#555; word-break:break-word; }
+  .img-option.is-primary { border-color:#4f46e5; box-shadow:0 0 0 3px rgba(79,70,229,.15); }
+</style>

@@ -16,10 +16,6 @@
   ]
 } %}
 
-
-
-
-
 <main>
   <div class="aaa">
 
@@ -158,7 +154,7 @@
         <button class="btn-devenir-membre">Devenir Membre</button>
 
         {# bouton "Ajouter un timbre" si l'utilisateur est connecté #}
-        {% if loggedin %}
+        {% if loggedin|default(false) %}
           <a href="{{ base }}/stamps/create" class="btn-devenir-membre">+ Ajouter un timbre</a>
         {% endif %}
       </div>
@@ -187,31 +183,25 @@
           {# Boucle dynamique sur les timbres venant de la BD #}
           {% for s in stamps %}
             <article class="carte">
-              {# Lien overlay vers la fiche (query-string, comme tu l'utilises) #}
-             <a href="{{ base }}/fiche-produit?id={{ s.id }} class="lien-produit">Voir plus de détails</a>
+              {# Lien overlay vers la fiche (query-string) #}
+              <a href="{{ base }}/fiche-produit?id={{ s.id }}" class="lien-produit">Voir plus de détails</a>
 
-            <figure class="carte-image">
-          
-
-         {% set raw = s.main_image|default('') %} {# ou img.image_url #}
-          {% if raw %}
-          {% set img_src = asset ~ '/' ~ raw %}  {# => /public/uploads/2025/08/fee0885ed6e83d11.jpg #}
-          {% else %}
-          {% set img_src = asset ~ '/assets/images/img-catalogue/photo-GB-1840.jpg' %}
-          {% endif %}
-
-            <img src="{{ img_src }}" alt="{{ s.name|e }}"
-            onerror="this.onerror=null;this.src='{{ asset }}/assets/images/img-catalogue/photo-GB-1840.jpg'">
-            </figure>
-
-
-
-
+              <figure class="carte-image">
+                {% set raw = s.main_image|default('') %}
+                {% if raw %}
+                  {% set clean = raw|trim('/') %}
+                  {% set img_src = asset ~ '/' ~ clean %}
+                {% else %}
+                  {% set img_src = asset ~ '/assets/images/img-catalogue/photo-GB-1840.jpg' %}
+                {% endif %}
+                <img src="{{ img_src }}" alt="{{ s.name|e }}"
+                     onerror="this.onerror=null;this.src='{{ asset }}/assets/images/img-catalogue/photo-GB-1840.jpg'">
+              </figure>
 
               <div class="carte-details">
                 <h3 class="carte-titre">{{ s.name|e }}</h3>
-                {% if s.price is not null %}
-                  <p class="carte-prix">${{ s.price }}</p>
+                {% if s.current_price is not null %}
+                  <p class="carte-prix">${{ s.current_price|number_format(2, '.', ' ') }}</p>
                 {% endif %}
               </div>
 
@@ -219,7 +209,7 @@
                 <button aria-label="Ajouter aux favoris">
                   <i class="fa-regular fa-heart"></i>
                 </button>
-                <a href="{{ base }}/fichierProduit?id={{ s.id }}" aria-label="Voir plus de détails">
+                <a href="{{ base }}/fiche-produit?id={{ s.id }}" aria-label="Voir plus de détails">
                   <i class="fa-solid fa-arrow-right"></i>
                 </a>
               </nav>

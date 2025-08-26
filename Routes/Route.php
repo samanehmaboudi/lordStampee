@@ -32,6 +32,10 @@ final class Route
         return $uri;
     }
 
+  
+
+
+
     public static function resolve(): void
     {
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';

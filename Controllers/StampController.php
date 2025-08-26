@@ -36,7 +36,7 @@ class StampController
     private function currentUploadsDir(): string
     {
         $subdir = date('Y/m');
-        $base   = __DIR__ . '/../../public/uploads/' . $subdir;   
+        $base   = __DIR__ . '/../../public/uploads/' . $subdir;
         if (!is_dir($base)) {
             @mkdir($base, 0775, true);
         }
@@ -76,23 +76,46 @@ class StampController
         return null;
     }
 
-    /** Sauve plusieurs fichiers uploadés; crée les lignes Image (Main pour i=0) */
+    /** Sauve plusieurs fichiers uploadés; crée les lignes Image (Main pour primaryIndex) */
     private function saveManyUploads(array $files, int $stampId, int $primaryIndex = 0): void
     {
-        $count = count($files['name']);
+        $maxSize = 5 * 1024 * 1024; // 5 Mo
+
+        // Construire la liste des index réellement valides
+        $valid = [];
+        $count = isset($files['name']) ? count($files['name']) : 0;
         for ($i = 0; $i < $count; $i++) {
-            if (($files['error'][$i] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-                error_log("UPLOAD ERROR index=$i code=" . ($files['error'][$i] ?? 'n/a'));
+            $err = $files['error'][$i] ?? UPLOAD_ERR_NO_FILE;
+            if (!empty($files['name'][$i]) && $err === UPLOAD_ERR_OK) {
+                $valid[] = $i;
+            } else {
+                if ($err !== UPLOAD_ERR_NO_FILE) {
+                    error_log("UPLOAD ERROR index=$i code=$err");
+                }
+            }
+        }
+        if (empty($valid)) return;
+
+        // Si l'index choisi n'est pas dans les valides, on prend le premier valide
+        $effectivePrimary = in_array($primaryIndex, $valid, true) ? $primaryIndex : $valid[0];
+
+        // Traiter tous les fichiers valides
+        foreach ($valid as $i) {
+            $size = (int)($files['size'][$i] ?? 0);
+            if ($size <= 0 || $size > $maxSize) {
+                error_log("UPLOAD SKIP (size) index=$i size=$size");
                 continue;
             }
+
             $rel = $this->moveOneUpload($files['tmp_name'][$i], $files['name'][$i]);
             if ($rel) {
-                $role = ($i === $primaryIndex) ? 'Main' : 'Additional';
+                $role = ($i === $effectivePrimary) ? 'Main' : 'Additional'; // ← comparaison avec $i (index original)
                 (new \App\Models\Image())->create($stampId, $rel, $role);
+            } else {
+                error_log("UPLOAD MOVE FAILED index=$i name=" . ($files['name'][$i] ?? ''));
             }
         }
     }
-
 
     /* ==================== Vues ==================== */
 
@@ -119,11 +142,16 @@ class StampController
     {
         $this->requireLogin();
 
+        // Harmonisation avec le champ du formulaire: creationYear → creationDate (si ton modèle attend une date)
+        $creationYear = isset($_POST['creationYear']) ? (int)$_POST['creationYear'] : (int)date('Y');
+        $creationYear = max(1800, min($creationYear, 2030));
+        $creationDate = sprintf('%04d-01-01', $creationYear);
+
         // 1) Créer le timbre
         $mStamp = new Stamp();
         $stampId = $mStamp->create([
             'name'         => trim($_POST['name'] ?? ''),
-            'creationDate' => $_POST['creationDate'] ?? date('Y-m-d'),
+            'creationDate' => $creationDate,
             'User_id'      => $this->userId(),
             'condition_id' => (int)($_POST['condition_id'] ?? 1),
             'country_id'   => (int)($_POST['country_id'] ?? 1),
@@ -131,15 +159,21 @@ class StampController
             'color_id'     => !empty($_POST['color_id']) ? (int)$_POST['color_id'] : null,
         ]);
 
-        // 2) Images (multiple)
-        if (!empty($_FILES['images']['name'][0])) {
-            $primaryIndex = isset($_POST['primary_index']) ? (int)$_POST['primary_index'] : 0;
+        // 2) Images multiples
+        if (!empty($_FILES['images']['name']) && count(array_filter($_FILES['images']['name'])) > 0) {
+
+            // index reçu depuis le radio (peut être absent si l'utilisateur a "décoché")
+            $primaryIndex = (isset($_POST['primary_index']) && $_POST['primary_index'] !== '')
+                ? (int)$_POST['primary_index']
+                : 0; // fallback sûr
+
             $this->saveManyUploads($_FILES['images'], $stampId, $primaryIndex);
         }
 
         $_SESSION['success'] = 'Timbre créé avec ses images.';
         return View::redirect('stamps');
     }
+
 
     /* ==================== MES TIMBRES ==================== */
 
@@ -162,6 +196,7 @@ class StampController
     public function edit()
     {
         $this->requireLogin();
+
         $id = (int)($_GET['id'] ?? 0);
         if ($id <= 0) {
             $_SESSION['error'] = "ID manquant.";
@@ -175,8 +210,14 @@ class StampController
             return View::redirect('stamps');
         }
 
+        // ➜ Charger les images du timbre (Main d’abord grâce à ORDER dans le modèle)
+        $images = (new Image())->getByStampId($id);
+        // (facultatif) petit log pour diagnostiquer si besoin
+        // error_log('[edit] stamp '.$id.' images='.count($images));
+
         $data = [
             'stamp'       => $stamp,
+            'images'      => $images,             // ← IMPORTANT : on passe la liste à la vue
             'countries'   => Country::getAll(),
             'categories'  => Category::getAll(),
             'conditions'  => StampCondition::getAll(),
@@ -189,18 +230,29 @@ class StampController
         return View::render('stamps/edit', $data);
     }
 
+
     public function update()
     {
         $this->requireLogin();
+
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             $_SESSION['error'] = "ID manquant.";
             return View::redirect('stamps');
         }
 
-        // 1) Mettre à jour les champs texte
-        $mStamp = new Stamp();
-        $ok = $mStamp->updateForOwner($id, $this->userId(), [
+        // Vérifier l'autorisation une fois pour toutes
+        $stampRow = (new Stamp())->findByIdForOwner($id, $this->userId());
+        if (!$stampRow) {
+            $_SESSION['error'] = "Non autorisé ou timbre inexistant.";
+            return View::redirect('stamps');
+        }
+
+        $imgModel = new Image();
+        $changed  = false;
+
+        // 1) MAJ des champs texte (OK même si aucune ligne n'est modifiée)
+        $ok = (new Stamp())->updateForOwner($id, $this->userId(), [
             'name'         => trim($_POST['name'] ?? ''),
             'creationDate' => $_POST['creationDate'] ?? date('Y-m-d'),
             'country_id'   => (int)($_POST['country_id'] ?? 1),
@@ -208,39 +260,84 @@ class StampController
             'condition_id' => (int)($_POST['condition_id'] ?? 1),
             'color_id'     => !empty($_POST['color_id']) ? (int)$_POST['color_id'] : null,
         ]);
-        if (!$ok) {
-            $_SESSION['error'] = 'Non autorisé ou aucune modification.';
-            return View::redirect('stamps/edit?id=' . $id);
+        if ($ok) {
+            $changed = true;
+        } // si pas modifié, on continue quand même
+
+        // 2) Suppression d’images cochées
+        $before = $imgModel->getByStampId($id);
+        $byId   = [];
+        foreach ($before as $im) {
+            $byId[(int)$im['id']] = $im;
         }
 
-        // 2) Changer l’image principale parmi celles EXISTANTES
-        if (!empty($_POST['make_main_id'])) {
-            $makeMainId = (int)$_POST['make_main_id'];
-            (new Image())->setMain($id, $makeMainId, $this->userId());
-        }
-
-        // 3) Ajouter de NOUVELLES images 
-        if (!empty($_FILES['images']['name'][0])) {
-            $primaryIndex = isset($_POST['primary_index']) ? (int)$_POST['primary_index'] : -1; // -1 => ne pas toucher la Main
-            $files = $_FILES['images'];
-            $count = count($files['name']);
-
-            for ($i = 0; $i < $count; $i++) {
-                if ($files['error'][$i] !== UPLOAD_ERR_OK) continue;
-                $rel = $this->moveOneUpload($files['tmp_name'][$i], $files['name'][$i]);
-                if ($rel) {
-                    $role = ($i === $primaryIndex) ? 'Main' : 'Additional';
-                    (new Image())->create($id, $rel, $role);
-                    // si on vient de désigner une nouvelle Main, setMain s’occupera de rétrograder les autres
-                    if ($role === 'Main') {
-                        // récupère l’id de l’insert si besoin dans ton modèle Image->create (sinon on laisse comme ça)
-                        // (new Image())->setMain($id, $newImageId, $this->userId());
+        if (!empty($_POST['delete_ids']) && is_array($_POST['delete_ids'])) {
+            foreach ($_POST['delete_ids'] as $imgIdRaw) {
+                $imgId = (int)$imgIdRaw;
+                if (isset($byId[$imgId])) {
+                    $full = dirname(__DIR__, 2) . '/public/assets/images/' . ltrim($byId[$imgId]['image_url'], '/');
+                    if (is_file($full)) @unlink($full);
+                    if ($imgModel->deleteByIdForOwner($imgId, $this->userId())) {
+                        $changed = true;
                     }
                 }
             }
         }
 
-        $_SESSION['success'] = 'Timbre modifié.';
+        // 3) Choix de la principale
+        $mainChoice = $_POST['main_choice'] ?? 'keep'; // keep | existing | new
+
+        // 3.a) Nouvelles images (taille seulement) + éventuelle nouvelle "Main"
+        if (!empty($_FILES['images']['name'][0])) {
+            $files   = $_FILES['images'];
+            $count   = count($files['name']);
+            $maxSize = 5 * 1024 * 1024; // 5 Mo
+
+            $primaryIndex = -1;
+            if ($mainChoice === 'new' && isset($_POST['primary_index']) && $_POST['primary_index'] !== '') {
+                $primaryIndex = (int)$_POST['primary_index'];
+            }
+
+            $newMainId = null;
+            $validPos  = 0;
+
+            for ($i = 0; $i < $count; $i++) {
+                if (($files['error'][$i] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) continue;
+                $size = (int)($files['size'][$i] ?? 0);
+                if ($size <= 0 || $size > $maxSize) continue;
+
+                $rel = $this->moveOneUpload($files['tmp_name'][$i], $files['name'][$i]); // retourne "uploads/AAAA/MM/xxx.jpg"
+                if (!$rel) continue;
+
+                $insertedId = $imgModel->create($id, $rel, 'Additional');
+                $changed = true;
+
+                if ($mainChoice === 'new' && $primaryIndex === $validPos) {
+                    $newMainId = $insertedId;
+                }
+                $validPos++;
+            }
+
+            if ($mainChoice === 'new' && $newMainId) {
+                if ($imgModel->setMain($id, $newMainId, $this->userId())) {
+                    $changed = true;
+                }
+            }
+        }
+
+        // 3.b) Principale EXISTANTE
+        if ($mainChoice === 'existing' && !empty($_POST['primary_existing_id']) && ctype_digit((string)$_POST['primary_existing_id'])) {
+            if ($imgModel->setMain($id, (int)$_POST['primary_existing_id'], $this->userId())) {
+                $changed = true;
+            }
+        }
+
+        // Message de fin
+        if ($changed) {
+            $_SESSION['success'] = 'Timbre modifié.';
+        } else {
+            $_SESSION['success'] = 'Aucune modification.';
+        }
         return View::redirect('stamps');
     }
 
@@ -270,7 +367,7 @@ class StampController
         $ok = $mStamp->deleteForOwner($id, $this->userId());
         if ($ok) {
             foreach ($paths as $rel) {
-                $file = __DIR__ . '/../../public/assets/images/' . $rel;
+                $file = __DIR__ . '/../../public/' . $rel;
                 if (is_file($file)) @unlink($file);
             }
             $_SESSION['success'] = "Timbre supprimé.";
@@ -285,36 +382,59 @@ class StampController
 
     public function indexPublic()
     {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        $loggedin = !empty($_SESSION['user_id']);
+        $db = \App\Models\Database::getConnection();
 
-        $db = Database::getConnection();
+        // Liste des timbres avec: pays, image principale, prix actuel, nb mises
         $sql = "
-            SELECT
-                s.id, s.name, s.creationDate,
-                c.name AS country,
-                (SELECT i.image_url
-                   FROM Image i
-                  WHERE i.Stamp_id = s.id AND i.image_type = 'Main'
-                  ORDER BY i.id ASC LIMIT 1) AS main_image,
-                (SELECT a.current_price
-                   FROM Auction a
-                  WHERE a.Stamp_id = s.id
-                  ORDER BY a.id DESC LIMIT 1) AS price
-            FROM Stamp s
-            LEFT JOIN Country c ON c.id = s.country_id
-            ORDER BY s.id DESC";
-        $stamps = $db->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+      SELECT
+        s.id,
+        s.name,
+        s.creationDate,
+        co.name  AS country_name,
 
-        return View::render('pages/catalogueProduit', [
-            'stamps'   => $stamps,
-            'loggedin' => $loggedin,
-            'asset'    => $GLOBALS['asset'] ?? '',
-            'base'     => $GLOBALS['base']  ?? '',
+        -- image principale si marquée 'Main', sinon n'importe laquelle
+        COALESCE(img_main.image_url, img_any.image_url) AS main_image,
+
+        -- stats d'enchère
+        COALESCE(auc.curr_price, 0.00)  AS current_price,
+        COALESCE(auc.bids_count, 0)     AS bids_count
+      FROM Stamp s
+      LEFT JOIN Country co ON co.id = s.country_id
+
+      -- image principale
+      LEFT JOIN Image img_main
+             ON img_main.Stamp_id = s.id AND img_main.image_type = 'Main'
+      -- image fallback si pas de 'Main'
+      LEFT JOIN (
+          SELECT i2.Stamp_id, MIN(i2.image_url) AS image_url
+          FROM Image i2
+          GROUP BY i2.Stamp_id
+      ) AS img_any ON img_any.Stamp_id = s.id
+
+      -- stats enchères : prix courant = MAX(b.amount), nb mises = COUNT(b.id)
+      LEFT JOIN (
+          SELECT a.stamp_id,
+                 MAX(b.amount) AS curr_price,
+                 COUNT(b.id)   AS bids_count
+          FROM auction a
+          LEFT JOIN bid b ON b.auction_id = a.id
+          GROUP BY a.stamp_id
+      ) AS auc ON auc.stamp_id = s.id
+
+      ORDER BY s.id DESC
+    ";
+
+        $rows = $db->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+
+        return \App\Providers\View::render('pages/catalogueProduit', [
+            'stamps' => $rows,
+            'base'   => defined('BASE')  ? BASE  : '',
+            'asset'  => defined('ASSET') ? ASSET : '',
         ]);
     }
 
-    /* ====================catologueProduit ==================== */
+
+    /* ==================== CatologueProduit ==================== */
     public function showPublic($id = null)
     {
         if ($id === null && isset($_GET['id'])) {

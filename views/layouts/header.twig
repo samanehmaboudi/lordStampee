@@ -1,5 +1,4 @@
-{# === Chemins de base (UNE seule fois) === #}
-{# base  : racine de ton app (ex: /Stampee-new/Projet-web1-sprint1) #}
+
 {# assets: racine publique /public (ne pas mettre /public dans "base") #}
 {# racine app & /public #}
 {% set base        = (base  is defined and base)  ? base  : '/Stampee-new/Projet-web1-sprint1' %}
@@ -33,10 +32,18 @@
 
   {# --- CSS de page (optionnels) : chargés APRÈS --- #}
   {% if page_css is defined and page_css %}
+  
     {% for href in page_css %}
       <link rel="stylesheet" href="{{ href }}" />
     {% endfor %}
   {% endif %}
+
+  {# En bas du body - JS #}
+{% if page_js is defined and page_js %}
+  {% for js in page_js %}
+    <script defer src="{{ js }}"></script>
+  {% endfor %}
+{% endif %}
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
