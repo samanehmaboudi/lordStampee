@@ -62,7 +62,6 @@
   height: 5px;
   border-radius: 5px;
   outline: none;
-  -webkit-appearance: none;
   background: #D1E1FA;           /* piste */
 }
 .filtre-range input[type="range"]::-webkit-slider-thumb {

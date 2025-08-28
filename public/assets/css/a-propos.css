@@ -1,119 +1,100 @@
-/* ----------- Section "À propos" ----------- */
-.a-propos {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 50px;
-    padding: 80px 5%;
-    background: #f5f5f5;
+/* ----------- Section "À propos" (complet) ----------- */
+
+.a-propos{
+  display:flex;
+  gap:50px;
+  align-items:flex-start;          /* le contenu s'aligne en HAUT */
+  justify-content:space-between;
+  padding:80px 5%;
+  background:#f5f5f5;
 }
 
-/* Image à gauche */
-.a-propos-image {
-    flex: 1;
+/* Texte à gauche – on le place avant visuellement */
+.a-propos-texte{
+  order:1;                         /* texte à gauche sans changer le HTML */
+  flex:1 1 50%;
+  align-self:flex-start;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding:20px;
+  background:#eaeff4;
+  border-radius:8px;
 }
 
-.a-propos-image img {
-    width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+.a-propos h2{
+  font-size:32px;
+  color:#2d3e50;
+  margin:0 0 12px;
 }
 
-/* Texte à droite */
-.a-propos-texte {
-    flex: 1;
-    padding: 20px;
-    background: #eaeff4;
-    border-radius: 8px;
+.a-propos p{
+  font-size:18px;
+  color:#333;
+  margin:0 0 12px;
+  line-height:1.6;
 }
 
-.a-propos h2 {
-    font-size: 32px;
-    color: #2d3e50;
-    margin-bottom: 15px;
+/* Image à droite */
+.a-propos-image{
+  order:2;                         /* image à droite */
+  flex:1 1 50%;
 }
-
-.a-propos p {
-    font-size: 18px;
-    color: #333;
-    margin-bottom: 15px;
-    line-height: 1.6;
+.a-propos-image img{
+  width:100%;
+  height:auto;                     /* conserve les proportions */
+  max-height:520px;                /* évite une image trop haute */
+  object-fit:cover;
+  border-radius:8px;
+  box-shadow:0 4px 10px rgba(0,0,0,.1);
 }
 
 /* Bouton */
-.a-propos .btn {
-    display: inline-block;
-    padding: 12px 20px;
-    background: gold;
-    color: black;
-    text-transform: uppercase;
-    text-decoration: none;
-    font-weight: bold;
-    border-radius: 5px;
-    transition: 0.3s;
-    border: 2px solid transparent;
+.a-propos .btn{
+  display:inline-block;
+  padding:12px 20px;
+  background:gold;
+  color:#000;
+  text-transform:uppercase;
+  text-decoration:none;
+  font-weight:700;
+  border-radius:5px;
+  border:2px solid transparent;
+  transition:background-color .2s ease, border-color .2s ease;
+}
+.a-propos .btn:hover{
+  background:#ffcc00;
+  border-color:#000;
 }
 
-.a-propos .btn:hover {
-    background: #ffcc00;
-    border-color: black;
+/* ----------- Responsive ----------- */
+@media (max-width:1024px){
+  .a-propos{
+    flex-direction:column;
+    align-items:stretch;
+    text-align:center;
+    gap:30px;
+  }
+  .a-propos-texte,
+  .a-propos-image{
+    order:0;                       /* on annule l’inversion sur mobile */
+    flex-basis:auto;
+  }
+  .a-propos-image img{ max-height:none; }
+  .a-propos h2{ font-size:28px; }
+  .a-propos p{ font-size:16px; }
 }
 
-/*  Responsive - Tablettes et Mobiles */
-@media screen and (max-width: 1024px) {
-    .a-propos {
-        flex-direction: column; /* Passe en colonne */
-        text-align: center;
-        gap: 30px;
-    }
-
-    .a-propos-image, .a-propos-texte {
-        width: 100%;
-    }
-
-    .a-propos h2 {
-        font-size: 28px;
-    }
-
-    .a-propos p {
-        font-size: 16px;
-    }
+@media (max-width:768px){
+  .a-propos{ padding:50px 5%; }
+  .a-propos h2{ font-size:24px; }
+  .a-propos p{ font-size:15px; }
+  .a-propos .btn{ padding:10px 18px; font-size:14px; }
 }
 
-@media screen and (max-width: 768px) {
-    .a-propos {
-        padding: 50px 5%;
-    }
-
-    .a-propos h2 {
-        font-size: 24px;
-    }
-
-    .a-propos p {
-        font-size: 15px;
-    }
-
-    .a-propos .btn {
-        padding: 10px 18px;
-        font-size: 14px;
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .a-propos {
-        padding: 40px 5%;
-    }
-
-    .a-propos h2 {
-        font-size: 22px;
-    }
-
-    .a-propos p {
-        font-size: 14px;
-    }
-
-    .a-propos .btn {
-        padding: 8px 16px;
-        font-size: 13px;
-    }
+@media (max-width:480px){
+  .a-propos{ padding:40px 5%; }
+  .a-propos h2{ font-size:22px; }
+  .a-propos p{ font-size:14px; }
+  .a-propos .btn{ padding:8px 16px; font-size:13px; }
 }

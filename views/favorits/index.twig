@@ -1,0 +1,40 @@
+<h1>Mes favoris</h1>
+
+<div class="catalogue-grid">
+  {% for s in stamps %}
+    <article class="carte">
+      <a href="{{ base }}/fiche-produit?id={{ s.id }}" class="lien-produit">Voir plus de détails</a>
+      <figure class="carte-image">
+        <img src="{{ asset ~ '/' ~ (s.main_image|default('assets/images/img-catalogue/photo-GB-1840.jpg')|trim('/')) }}"
+             alt="{{ s.name|e }}">
+      </figure>
+      <div class="carte-details">
+        <h3 class="carte-titre">{{ s.name }}</h3>
+        {% if s.current_price is not null %}
+          <p class="carte-prix">${{ s.current_price|number_format(2, '.', ' ') }}</p>
+        {% endif %}
+      </div>
+    </article>
+  {% else %}
+    <p>Aucun favori pour l’instant.</p>
+  {% endfor %}
+</div>
+
+<script>
+document.addEventListener('click', async (e)=>{
+  const f = e.target.closest('.fav-form');
+  if (!f) return;
+  e.preventDefault();
+  const fd = new FormData(f);
+  const res = await fetch(f.action, {
+    method: 'POST',
+    headers: {'X-Requested-With': 'XMLHttpRequest'},
+    body: fd
+  });
+  const data = await res.json();
+  if (data.ok) {
+    f.querySelector('.btn-fav')?.classList.toggle('is-on', !!data.favorite);
+  }
+});
+</script>
+

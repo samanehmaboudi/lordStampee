@@ -1,34 +1,24 @@
-/* ===== GALERIE D'IMAGES ===== */
-
-/* le parent .container gère déjà 2 colonnes; on évite width:50% ici */
-.image-container{
-  display: grid;
-  gap: var(--espace-grand, 16px);
-  min-width: 0; /* évite les débordements en grid */
-  position: relative;
-}
-
+/* ====== Galerie : conteneur ====== */
 .galerie-images{
   display: grid;
-  gap: var(--espace-grand, 16px);
+  gap: 16px;
   justify-items: center;
   border: 1px solid var(--couleur-bordure, #e5e7eb);
-  padding: var(--espace-grand, 16px);
+  padding: 16px;
   background: #f8f8f8;
   border-radius: 12px;
 }
 
-/* --- miniatures --- */
-
-/* sur mobile: carrousel horizontal; sur desktop: grille fixe */
+/* ====== Miniatures ====== */
 .miniatures{
   display: grid;
   grid-auto-flow: column;
-  gap: var(--espace-moyen, 10px);
+  gap: 10px;
   overflow-x: auto;
   padding-bottom: 4px;
   scrollbar-width: thin;
 }
+
 @media (min-width: 960px){
   .miniatures{
     grid-auto-flow: row;
@@ -37,53 +27,62 @@
   }
 }
 
-/* si tu gardes <img>, pense à tabindex="0". encore mieux: <button><img/></button> */
 .miniatures img{
   width: 72px;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1/1;
   object-fit: cover;
   border: 2px solid var(--couleur-bordure, #e5e7eb);
   border-radius: 8px;
+  background: #fff;
   cursor: pointer;
   transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
-  background: #fff;
   display: block;
 }
-.miniatures img:hover{ transform: translateY(-1px); border-color: var(--couleur-or, #d97706); }
-.miniatures img:focus{ outline: none; box-shadow: 0 0 0 3px rgba(217,119,6,.25); }
-
-/* miniature sélectionnée */
-.miniatures .is-active{
-  border-color: var(--couleur-or, #d97706);
-  box-shadow: 0 0 0 2px rgba(217,119,6,.35) inset;
+.miniatures img:hover{ transform: translateY(-1px); border-color: var(--couleur-or, #cd1212); }
+.miniatures img.is-active{
+  border-color: var(--couleur-or, #cd1212);
+  box-shadow: 0 0 0 2px rgba(202, 27, 11, 0.35);
 }
 
-/* --- image principale --- */
+/* ====== Image principale : bloc stable ====== */
 .image-principale{
   width: 100%;
+  max-width: 560px;   /* ajuste si tu veux plus large */
   display: grid;
   justify-items: center;
-  gap: var(--espace-moyen, 10px);
+  gap: 10px;
 }
 
+/* La frame fige la taille grâce à aspect-ratio (pas de débordement) */
+.image-principale .frame{
+  width: 100%;
+  /* Choisis l’aspect le plus proche de tes timbres : 4/5 est pas mal */
+  aspect-ratio: 4 / 5;
+  max-height: 520px;           /* limite visuelle optionnelle */
+  background: #fff;
+  border: 3px solid var(--couleur-bordure, #e5e7eb);
+  border-radius: 12px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+/* L’image se contient dans la frame, quelle que soit sa taille d’origine */
 .image-principale img{
   width: 100%;
-  max-width: 520px;
-  max-height: 440px;
+  height: 100%;
   object-fit: contain;
-  background: #fff;
-  border-radius: 10px;
-  border: 3px solid var(--couleur-bordure, #e5e7eb);
+  display: block;      /* évite les lignes fantômes */
 }
 
-/* légende */
+/* Légende */
 .image-principale figcaption{
   text-align: center;
-  font-size: var(--taille-texte, .95rem);
+  font-size: .95rem;
   color: var(--couleur-gris, #6b7280);
 }
 
-/* icône cœur (favori) si présent */
+/* Icône cœur si présent */
 .icone-coeur{
   position: absolute;
   top: 10px; right: 12px;
@@ -91,13 +90,73 @@
   color: #e11d48;
 }
 
-.miniatures img { outline: none; }
-.miniatures img.is-active {
-  border-color: var(--couleur-or, #eab308);
-  box-shadow: 0 0 0 2px rgba(234, 179, 8, .35);
+
+/* --- FAV dans la galerie --- */
+.galerie-images { position: relative; } /* ancre le coeur en absolu */
+
+/* Position (même place que ton icône d’avant) */
+.icone-coeur {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 2;
+  line-height: 0;
 }
 
-.image-principale { overflow: hidden; }
-.image-principale img { display:block; max-width:100%; height:auto; }
-.image-principale.is-zoomed img { cursor: grab; }
+/* Bouton (état par défaut) */
+.btn-fav {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  padding: 6px 9px;               /* zone cliquable confortable */
+  border-radius: 999px;           /* pastille ronde/ovale */
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(4px);
+  color: #6b7280;                 /* gris neutre */
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+  transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease, color .12s ease;
+}
+
+.btn-fav i { font-size: 18px; }
+
+.btn-fav:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,.18);
+}
+
+.btn-fav:active { transform: translateY(0); }
+
+.btn-fav:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(234,179,8,.35), 0 2px 6px rgba(0,0,0,.15);
+}
+
+/* État ACTIVÉ (dans les favoris) */
+.btn-fav.is-on {
+  color: #cd1212;            /* or (amber-500) */
+  background: #fff7ed;       /* très léger orange */
+}
+
+/* Version lien (utilisateur non connecté) */
+a.icone-coeur {
+  color: #6b7280;
+  background: rgba(255,255,255,.92);
+  padding: 6px 9px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+a.icone-coeur:hover { color: #eab308; }
+
+@media (hover: none) {
+  .btn-fav:hover { transform: none; }
+}
+
+/* Petit utilitaire si tu n’en as pas déjà un */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
 

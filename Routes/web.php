@@ -56,4 +56,13 @@ Route::get('auctions/create',          'AuctionController@create');  // (optionn
 Route::post('auctions/store',          'AuctionController@store');   // (optionnel) POST créer
 
 
+// Favoris
+Route::post('favoris/toggle', 'FavoriteController@toggle');     // POST depuis la fiche
+Route::get('mes-favoris',     'FavoriteController@myFavorites'); // page "Mes favoris"
+
+
+
+
+
+
 
