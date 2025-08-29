@@ -212,12 +212,11 @@ class StampController
 
         // ➜ Charger les images du timbre (Main d’abord grâce à ORDER dans le modèle)
         $images = (new Image())->getByStampId($id);
-        // (facultatif) petit log pour diagnostiquer si besoin
-        // error_log('[edit] stamp '.$id.' images='.count($images));
+
 
         $data = [
             'stamp'       => $stamp,
-            'images'      => $images,             // ← IMPORTANT : on passe la liste à la vue
+            'images'      => $images,             //  on passe la liste à la vue
             'countries'   => Country::getAll(),
             'categories'  => Category::getAll(),
             'conditions'  => StampCondition::getAll(),
@@ -275,7 +274,8 @@ class StampController
             foreach ($_POST['delete_ids'] as $imgIdRaw) {
                 $imgId = (int)$imgIdRaw;
                 if (isset($byId[$imgId])) {
-                    $full = dirname(__DIR__, 2) . '/public/assets/images/' . ltrim($byId[$imgId]['image_url'], '/');
+                    $full = dirname(__DIR__, 2) . '/public/' . ltrim($byId[$imgId]['image_url'], '/');
+
                     if (is_file($full)) @unlink($full);
                     if ($imgModel->deleteByIdForOwner($imgId, $this->userId())) {
                         $changed = true;

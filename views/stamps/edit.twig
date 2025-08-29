@@ -1,4 +1,4 @@
-{# chemin des assets pour cette page #} 
+{# chemin des assets pour cette page #}  
 {% set _assets = (asset is defined and asset) ? asset : (base ~ '/public') %}
 
 {# header + CSS/JS spécifiques à la page #}
@@ -76,21 +76,18 @@
       {% if has_images %}
         <div class="image-previews">
           {% for img in images %}
-            {# src robuste selon le contenu de image_url #}
-            {% set img_src = img.image_url starts with('/') 
-                ? (_assets ~ img.image_url) 
-                : (_assets ~ '/assets/images/' ~ img.image_url) %}
-            <label class="img-option {{ img.image_type == 'Main' ? 'is-primary' }}">
+            {% set img_src = _assets ~ '/' ~ (img.image_url|trim('/')) %}
+            <div class="img-option {{ img.image_type == 'Main' ? 'is-primary' }}">
               <img class="gallery-img"
                    src="{{ img_src }}"
                    alt="{{ stamp.name|e }}"
                    loading="lazy" decoding="async">
               <span class="filename">{{ img.image_type }} • #{{ img.id }}</span>
-              <label style="font-size:12px; display:block; margin-top:6px;">
+              <label class="del" style="font-size:12px; display:block; margin-top:6px;">
                 <input type="checkbox" name="delete_ids[]" value="{{ img.id }}">
                 Supprimer cette image
               </label>
-            </label>
+            </div>
           {% endfor %}
         </div>
       {% else %}
@@ -114,16 +111,22 @@
         </label>
         <div id="existing-picker" class="image-previews hidden">
           {% for img in images %}
-            {% set img_src = img.image_url starts with('/') 
-                ? (_assets ~ img.image_url) 
-                : (_assets ~ '/assets/images/' ~ img.image_url) %}
-            <label class="img-option {{ img.image_type == 'Main' ? 'is-primary' }}">
-              <input type="radio" name="primary_existing_id" value="{{ img.id }}"
-                     {{ img.image_type == 'Main' ? 'checked' }}
-                     style="position:absolute; top:8px; left:8px;">
+            {% set img_src = _assets ~ '/' ~ (img.image_url|trim('/')) %}
+            <div class="img-option {{ img.image_type == 'Main' ? 'is-primary' }}">
+              <input
+                type="radio"
+                class="pick-existing"
+                name="primary_existing_id"
+                value="{{ img.id }}"
+                id="exist{{ img.id }}"
+                {{ img.image_type == 'Main' ? 'checked' }}
+                style="position:absolute;left:8px;top:8px;opacity:0;width:18px;height:18px;z-index:2;"
+              >
+              <label for="exist{{ img.id }}" class="radio-badge">Principale</label>
+
               <img src="{{ img_src }}" alt="{{ stamp.name|e }}" loading="lazy" decoding="async">
               <span class="filename">{{ img.image_type }} • #{{ img.id }}</span>
-            </label>
+            </div>
           {% endfor %}
         </div>
       {% endif %}
@@ -150,7 +153,7 @@
 
 {% include 'layouts/footer.twig' %}
 
-{# === petit JS d’appoint pour afficher/masquer les bons blocs & gérer "required" === #}
+{# === JS d’appoint : bascule des cadres + sélection de principale (existing/new) === #}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const existingPicker = document.getElementById('existing-picker');
@@ -172,15 +175,118 @@ document.addEventListener('DOMContentLoaded', () => {
 
   choiceInputs.forEach(r => r.addEventListener('change', sync));
   sync();
+
+  // ① quand on clique une radio d’image existante → forcer "existing" + feedback visuel
+  document.addEventListener('change', (e) => {
+    if (e.target && e.target.matches('input.pick-existing')) {
+      const mc = document.querySelector('input[name="main_choice"][value="existing"]');
+      if (mc && !mc.checked) {
+        mc.checked = true;
+        sync();
+      }
+      document.querySelectorAll('#existing-picker .img-option').forEach(el => el.classList.remove('is-primary'));
+      const card = e.target.closest('.img-option');
+      if (card) card.classList.add('is-primary');
+    }
+  });
+
+  // ② Aperçus & choix de la principale pour les nouvelles images (fallback si main-photo.js est absent)
+  const fileInput = document.getElementById('images');
+  function renderPreviews(files){
+    if (!newPicker) return;
+    newPicker.innerHTML = '';
+    if (!files || !files.length) {
+      newPicker.innerHTML = '<p class="note">Les aperçus apparaîtront ici.</p>';
+      return;
+    }
+    [...files].forEach((file, i) => {
+      const url = URL.createObjectURL(file);
+      const wrap = document.createElement('div');
+      wrap.className = 'img-option' + (i===0 ? ' is-primary' : '');
+      wrap.innerHTML = `
+        <label style="position:absolute;top:6px;left:6px;background:#fff;padding:2px 8px;border-radius:999px;border:1px solid #ddd;">
+          <input type="radio" name="primary_index" value="${i}" ${i===0?'checked':''}>
+          Principale
+        </label>
+        <img src="${url}" alt="aperçu ${i+1}" style="width:100%;height:120px;object-fit:cover;border-radius:6px;">
+        <span class="filename">${file.name}</span>
+      `;
+      newPicker.appendChild(wrap);
+    });
+  }
+  if (fileInput) {
+    fileInput.addEventListener('change', e => {
+      // bascule automatiquement le mode en "new"
+      const mc = document.querySelector('input[name="main_choice"][value="new"]');
+      if (mc && !mc.checked) {
+        mc.checked = true;
+        sync();
+      }
+      renderPreviews(e.target.files);
+    });
+  }
+
+  // ③ surlignage quand on change de principale (new)
+  document.addEventListener('change', (e) => {
+    if (e.target && e.target.name === 'primary_index') {
+      document.querySelectorAll('#image-previews .img-option').forEach(el => el.classList.remove('is-primary'));
+      const card = e.target.closest('.img-option');
+      if (card) card.classList.add('is-primary');
+    }
+  });
 });
 </script>
 
-{# au cas où ta feuille ne l'aurait pas #}
-<style>
+{# Styles complémentaires #}
+{# <style>
   .hidden { display: none; }
   .image-previews { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; align-items:start; }
   .img-option { position:relative; display:grid; grid-template-rows:auto 1fr auto; gap:6px; padding:10px; border:1px solid #ddd; border-radius:10px; background:#fff; }
   .img-option img { width:100%; height:120px; object-fit:cover; border-radius:6px; display:block; }
   .img-option .filename { font-size:12px; color:#555; word-break:break-word; }
   .img-option.is-primary { border-color:#4f46e5; box-shadow:0 0 0 3px rgba(79,70,229,.15); }
+  .radio-badge{
+    position:absolute; top:6px; left:6px;
+    background:#fff; border:1px solid #ddd; border-radius:999px;
+    padding:2px 8px; font-size:12px; box-shadow:0 1px 3px rgba(0,0,0,.08);
+  }
+</style> #}
+
+<style>
+:root{
+  --bg:#0f172a; --surface:#fff; --muted:#64748b; --border:#e2e8f0;
+  --ring:#c7d2fe; --primary:#4f46e5; --primary-600:#4338ca; --danger:#ef4444;
+  --shadow:0 10px 25px rgba(2,6,23,.05);
+}
+.stamp-edit{max-width:1100px;margin:32px auto 56px;padding:20px 16px}
+.page-title{font-size:clamp(22px,3vw,28px);font-weight:700;margin:4px 0 20px;color:#0f172a}
+.form{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:900px){.form{grid-template-columns:1fr 1fr;gap:22px}}
+.form-group,.fieldset{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 14px 16px;box-shadow:var(--shadow)}
+.form-group label{display:block;font-weight:600;margin:2px 0 8px;color:#0f172a}
+.form-group input[type="text"],.form-group input[type="date"],.form-group input[type="number"],.form-group select,.form-group input:not([type]){width:100%;height:40px;border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:14px;background:#fff;transition:border-color .18s,box-shadow .18s}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px var(--ring)}
+.fieldset{grid-column:1/-1}
+.fieldset>legend{font-weight:700;padding:0 4px;color:#0f172a}
+.note{color:var(--muted);font-size:13px;margin-top:6px}
+.image-previews{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-top:10px}
+.img-option{position:relative;border:1px solid var(--border);border-radius:12px;background:#fff;padding:10px;box-shadow:var(--shadow);transition:transform .12s,box-shadow .12s,border-color .12s}
+.img-option:hover{transform:translateY(-1px);border-color:#cbd5e1;box-shadow:0 12px 28px rgba(2,6,23,.07)}
+.img-option img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;display:block;background:#f8fafc}
+.filename{margin-top:8px;font-size:12px;color:var(--muted);line-height:1.3}
+.img-option.is-primary{border-color:var(--primary);box-shadow:0 0 0 4px rgba(79,70,229,.15)}
+.radio-badge{position:absolute;top:8px;left:8px;z-index:1;font-size:12px;color:#0f172a;background:#fff;border:1px solid var(--border);border-radius:999px;padding:2px 8px;box-shadow:var(--shadow)}
+.fieldset label[style*="display:block"]{font-weight:600;color:#0f172a}
+.fieldset input[type="radio"]{transform:translateY(.1rem)}
+input[type="file"]{width:100%;border:1px dashed #cbd5e1;background:#f8fafc;padding:12px;border-radius:12px}
+.form-actions{grid-column:1/-1;display:flex;gap:10px;align-items:center;justify-content:flex-start;margin-top:4px}
+.btn{appearance:none;border:none;cursor:pointer;border-radius:12px;padding:10px 16px;font-weight:600;font-size:14px}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 8px 18px rgba(79,70,229,.25);transition:background .12s,transform .06s}
+.btn-primary:hover{background:var(--primary-600)} .btn-primary:active{transform:translateY(1px)}
+.btn-link{color:var(--muted);background:transparent;padding-left:0;text-decoration:underline}
+.alert{grid-column:1/-1;padding:12px 14px;border-radius:12px;font-weight:600}
+.alert-error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+.alert-success{background:#dcfce7;color:#14532d;border:1px solid #bbf7d0}
+.hidden{display:none}
 </style>
+

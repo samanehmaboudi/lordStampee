@@ -60,6 +60,12 @@ Route::post('auctions/store',          'AuctionController@store');   // (optionn
 Route::post('favoris/toggle', 'FavoriteController@toggle');     // POST depuis la fiche
 Route::get('mes-favoris',     'FavoriteController@myFavorites'); // page "Mes favoris"
 
+// Placer une mise 
+Route::post('auctions/bid',    'AuctionController@place');
+
+// Créer une enchère pour un timbre 
+Route::post('auctions/create', 'AuctionController@createForStamp');
+
 
 
 

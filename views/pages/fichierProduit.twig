@@ -129,14 +129,13 @@
               id="enchere"
               name="amount"
               type="number"
-              placeholder="Votre enchère"
+              placeholder="Votre enchère (min {{ minBid|number_format(2, '.', ' ') }} $)"
               min="{{ minBid|number_format(2, '.', '') }}"
               step="{{ incr|number_format(2, '.', '') }}"
               value="{{ minBid|number_format(2, '.', '') }}"
               required
             >
             <button class="btn-miser" type="submit">Placer une enchère</button>
-            <button class="bouton-annuler" type="reset">Annuler</button>
             <p class="hint">Minimum requis : {{ minBid|number_format(2, '.', ' ') }} $</p>
           </form>
         {% else %}
@@ -336,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script>
 function quickBid() {
-  const input = document.getElementById('enchere');
+  const input = document.querySelector('#bid-form input[name="amount"]');
   const form  = document.getElementById('bid-form');
   if (!input || !form) return goBid(); // fallback vers le scroll
   const min = parseFloat(input.getAttribute('min') || '0');
@@ -346,6 +345,16 @@ function quickBid() {
 function goBid(){
   const el = document.getElementById('bid-form') || document.getElementById('enchere');
   if (el) el.scrollIntoView({behavior:'smooth', block:'center'});
+}
+function cancelBid(btn){
+  // Trouve le bon formulaire (utile s'il y a plusieurs fiches sur la page)
+  const form  = btn.closest('form');
+  if (!form) return;
+  const input = form.querySelector('input[name="amount"]');
+  if (input) {
+    const min = parseFloat(input.getAttribute('min') || '0');
+    input.value = isNaN(min) ? '' : min.toFixed(2);
+  }
 }
 </script>
 
@@ -382,3 +391,14 @@ document.addEventListener('click', async (e) => {
   }
 });
 </script>
+
+function cancelBid(btn){
+  const form  = btn.closest('form');
+  if (!form) return;
+  const input = form.querySelector('input[name="amount"]');
+  if (input) {
+    const min = parseFloat(input.getAttribute('min') || '0');
+    input.value = isNaN(min) ? '' : min.toFixed(2);
+  }
+}
+
